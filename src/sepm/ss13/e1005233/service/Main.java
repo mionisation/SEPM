@@ -2,7 +2,7 @@ package sepm.ss13.e1005233.service;
 
 import java.sql.*;
 
-import sepm.ss13.e1005233.domain.ConnectionTool;
+import sepm.ss13.e1005233.dao.ConnectionTool;
 
 public class Main {
 
@@ -16,12 +16,13 @@ public class Main {
 
 		try {
 			ct.openConnection();
+			c = ct.getConnection();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
 		
 		
-		c = ct.getConnection();
+		
 		
 		
 		
@@ -40,6 +41,9 @@ public class Main {
 			System.out.println(result.getString(4));
 			System.out.println(result.getString(5));
 			System.out.println(result.getString(6));
+			System.out.println(result.getString(7));
+			System.out.println(result.getString(8));
+
 			}
 			
 		} catch (SQLException e2) {
