@@ -2,6 +2,7 @@ package sepm.ss13.e1005233.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import sepm.ss13.e1005233.domain.Pferd;
 
@@ -14,7 +15,8 @@ public class JDBCPferdDAO implements PferdDAO {
 	
 	ConnectionTool ct;
 	Connection c;
-	
+	Statement st = c.createStatement();
+			
 	public JDBCPferdDAO() throws SQLException {
 		ct = new ConnectionTool();
 		ct.openConnection();
