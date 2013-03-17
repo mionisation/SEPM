@@ -1,48 +1,54 @@
 package sepm.ss13.e1005233.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
+
+import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.domain.Rechnung;
 
+/**
+ * Stellt Methoden zum Austausch von Rechnung-entitäten zu einer über JDBC
+ * realisierten HSQLDB-Datenbank zur Verfügung
+ *
+ */
 public class JDBCRechnungDAO implements RechnungDAO {
 
-	/**
-	 * Stellt Methoden zum Austausch von Rechnung-entitäten zu einer über JDBC
-	 * realisierten HSQLDB-Datenbank zur Verfügung
-	 *
-	 */
-	ConnectionTool ct;
-	Connection c;
+	private ConnectionTool ct;
+	private Connection c;
+	private Statement st;
+	private static final Logger log = Logger.getLogger(JDBCRechnungDAO.class);
+
 	
 	public JDBCRechnungDAO() throws SQLException {
+		log.debug("Initialisiere JDBCRechnungDAO...");
 		ct = new ConnectionTool();
 		ct.openConnection();
 		c = ct.getConnection();
+		st = c.createStatement();
+		
 	}
 	
 	@Override
 	public void insertRechnung(Rechnung r) {
-		// TODO Auto-generated method stub
-
+		log.debug("Füge Rechnung ein mit Datum " + r.getDate().toString());
+		
 	}
 
 	@Override
 	public Rechnung getRechnung(Rechnung r) {
-		// TODO Auto-generated method stub
+		log.debug("Gebe Rechnung zurück mit Datum " + r.getDate().toString());
 		return null;
 	}
 
 	@Override
 	public void updateRechnung(Rechnung r) {
-		// TODO Auto-generated method stub
+		log.debug("Aktualisiere Rechnung mit Datum " + r.getDate().toString());
 		
 	}
 
 	@Override
 	public void deleteRechnung(Rechnung r) {
-		// TODO Auto-generated method stub
+		log.debug("Lösche Rechnung mit Datum " + r.getDate().toString());
 		
 	}
 

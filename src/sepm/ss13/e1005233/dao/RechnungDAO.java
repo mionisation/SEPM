@@ -1,8 +1,6 @@
 package sepm.ss13.e1005233.dao;
 
-import java.sql.Timestamp;
 
-import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 
 /**

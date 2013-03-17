@@ -13,6 +13,18 @@ public class Pferd {
 		this.id = id;
 	}
 	
+	public Pferd(int id, String name, String foto, double preis, String therapieart, String rasse,
+			 boolean kinderfreundlich, boolean deleted) {
+		this.id = id;
+		this.name = name;
+		this.foto = foto;
+		this.therapieart = therapieart;
+		this.rasse = rasse;
+		this.preis = preis;
+		this.kinderfreundlich = kinderfreundlich;
+		this.deleted = deleted;
+	}
+	
 	//Getter und Setter der Informationen
 	
 	public int getId() {
@@ -64,7 +76,8 @@ public class Pferd {
 		this.deleted = deleted;
 	}
 	
-	
-	
+	public String toString() {
+		return "" + id;
+	}
 	
 }

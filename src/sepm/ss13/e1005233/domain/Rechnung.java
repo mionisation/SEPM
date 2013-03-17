@@ -53,4 +53,8 @@ public class Rechnung {
 	public void setTelefon(int telefon) {
 		this.telefon = telefon;
 	}
+	
+	public String toString() {
+		return date.toString();
+	}
 }
