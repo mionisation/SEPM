@@ -30,21 +30,22 @@ public class JDBCPferdDAO implements PferdDAO {
 	}
 
 	@Override
-	public Pferd getPferd(int id) {
+	public Pferd getPferd(Pferd p) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void updatePferd(int id, Pferd p) {
+	public void updatePferd(Pferd p) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
-	public void deletePferd(int id) {
+	public void deletePferd(Pferd p) {
 		// TODO Auto-generated method stub
-
+		
 	}
+
 
 }

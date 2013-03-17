@@ -29,21 +29,22 @@ public class JDBCRechnungDAO implements RechnungDAO {
 	}
 
 	@Override
-	public Rechnung getRechnung(Timestamp date) {
+	public Rechnung getRechnung(Rechnung r) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void updateRechnung(Timestamp date, Rechnung r) {
+	public void updateRechnung(Rechnung r) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
-	public void deleteRechnung(Timestamp date) {
+	public void deleteRechnung(Rechnung r) {
 		// TODO Auto-generated method stub
-
+		
 	}
+
 
 }

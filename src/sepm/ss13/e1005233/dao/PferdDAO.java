@@ -19,7 +19,7 @@ public interface PferdDAO {
 	 * @param id der eindeutige Key zur Identifikation
 	 * @return das Pferd mit der angegebenen Id
 	 */
-	public Pferd getPferd (int id);
+	public Pferd getPferd (Pferd p);
 	
 	/**
 	 * Gibt ein Pferd p an, welches das durch die id spezifizierte Pferd
@@ -27,11 +27,11 @@ public interface PferdDAO {
 	 * @param id das zu ersetzende Pferd
 	 * @param p das neue (aktualisierte) Pferd
 	 */
-	public void updatePferd (int id, Pferd p);
+	public void updatePferd (Pferd p);
 	
 	/**
 	 * Löscht das spezifizierte Pferd
 	 * @param id die Id des zu löschenden Pferds
 	 */
-	public void deletePferd(int id);
+	public void deletePferd(Pferd p);
 }

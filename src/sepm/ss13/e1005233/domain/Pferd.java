@@ -9,6 +9,10 @@ public class Pferd {
 	private double preis;
 	private boolean kinderfreundlich, deleted;
 	
+	public Pferd(int id) {
+		this.id = id;
+	}
+	
 	//Getter und Setter der Informationen
 	
 	public int getId() {

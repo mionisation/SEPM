@@ -22,7 +22,7 @@ public interface RechnungDAO {
 	 * @param date das Datum der gesuchten Rechnung
 	 * @return die Rechnung mit dem spezifizierten Datum
 	 */
-	public Rechnung getRechnung (Timestamp date);
+	public Rechnung getRechnung (Rechnung r);
 	
 	/**
 	 * Gibt eine Rechnung r an, welche die durch date spezifizierte Rechnung
@@ -30,11 +30,11 @@ public interface RechnungDAO {
 	 * @param date die zu ersetzende Rechnung
 	 * @param r die neue (aktualisierte) Rechnung
 	 */
-	public void updateRechnung (Timestamp date, Rechnung r);
+	public void updateRechnung (Rechnung r);
 	
 	/**
 	 * Löscht die spezifizierte Rechnung
 	 * @param date das Datum der zu löschenden Rechnung
 	 */
-	public void deleteRechnung (Timestamp date);
+	public void deleteRechnung (Rechnung r);
 }

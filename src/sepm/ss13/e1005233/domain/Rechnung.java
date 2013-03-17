@@ -11,6 +11,10 @@ public class Rechnung {
 	private double gesamtpreis;
 	private int gesamtstunden, telefon;
 	
+	public Rechnung(Timestamp date) {
+		this.date = date;
+	}
+	
 	//Getter und Setter zu den Informationen
 
 	public Timestamp getDate() {
