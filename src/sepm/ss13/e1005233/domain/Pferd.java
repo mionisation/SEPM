@@ -11,6 +11,13 @@ public class Pferd {
 	
 	public Pferd(int id) {
 		this.id = id;
+		this.name = null;
+		this.foto = null;
+		this.therapieart = null;
+		this.rasse = null;
+		this.preis = 0;
+		this.kinderfreundlich = false;
+		this.deleted = false;
 	}
 	
 	public Pferd(int id, String name, String foto, double preis, String therapieart, String rasse,
@@ -80,8 +87,13 @@ public class Pferd {
 		return "" + id;
 	}
 	
-	public boolean equals(Pferd p) {
-		return id == p.getId() && name.equals(p.getName()) && foto.equals(p.getFoto()) &&
+	public boolean equals(Object o) {
+		Pferd p;
+		if(o instanceof Pferd)
+			p = (Pferd)o;
+		else
+			return false;
+		return	id == p.getId() && name.equals(p.getName()) && foto.equals(p.getFoto()) &&
 				therapieart.equals(p.getTherapieart()) && rasse.equals(p.getRasse()) &&
 				preis == p.getPreis() && kinderfreundlich == p.isKinderfreundlich() &&
 				deleted == p.isDeleted();

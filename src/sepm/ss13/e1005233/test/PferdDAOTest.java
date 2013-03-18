@@ -1,8 +1,6 @@
 package sepm.ss13.e1005233.test;
 
-import java.sql.SQLException;
 import java.util.*;
-
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
@@ -35,38 +33,50 @@ public abstract class PferdDAOTest {
 	}
 	
 	/**
-	 * Dieser Test versucht in der Datenbank eine Entität, die auf Null
+	 * Fügt ein Pferd in die 
+	 * @param p
+	 * @throws Exception
+	 */
+	public void insertPferdAndCheck(Pferd p) throws Exception {
+		//das Pferd darf nicht enthalten sein
+		pferde = pferdDao.findAll();
+		assertThat( pferde.contains(p), is(false));
+		pferdDao.insertPferd(p);
+		//das Pferd muss enthalten sein
+		pferde = pferdDao.findAll();
+		assertThat( pferde.contains(p), is(true));
+	}
+	
+	/**
+	 * Dieser Test versucht eine Entität, die auf Null
 	 * referenziert, zu speichern. Das DAO muss eine Exception werfen.
+	 * @throws Exception 
 	 */
 	@Test(expected = IllegalArgumentException.class)
-	public void insertNullEntityThrowsException() {
+	public void insertNullEntityThrowsException() throws Exception {
 		testpferd= null;
 		pferdDao.insertPferd(testpferd);
 	}
 	
 	/**
-	 * Dieser Test speichert eine valide Entität in die Datenbank
-	 * @throws SQLException 
+	 * Dieser Test speichert eine valide Entität ein
+	 * @throws Exception 
 	 */
 	@Test
-	public void insertValidEntity() throws SQLException {
+	public void insertValidEntity() throws Exception {
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
-		//das Pferd darf nicht enthalten sein
-		pferde = pferdDao.findAll();
-		assertThat( pferde.contains(testpferd), is(false));
-		pferdDao.insertPferd(testpferd);
-		//das Pferd muss enthalten sein
-		pferdDao.findAll();
-		assertThat( pferde.contains(testpferd), is(true));	}
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);	
+	}
 	
 	/**
 	 * Dieser Test versucht eine Entität abzuspeichern, die den Wert null in Feldern hat,
 	 *  die nicht null sein dürfen. Die Datenbank muss eine Exception werfen
-	 *  @throws SQLException
+	 *  @throws Exception
 	 */
 	@Test
-	public void insertNullArgumentEntity() throws SQLException {
+	public void insertNullArgumentEntityThrowsException() throws Exception {
 		testpferd = new Pferd(pferdDao.getNewId());
 		testpferd.setTherapieart("Hippotherapie");
 		testpferd.setRasse("Lippizaner");
@@ -76,20 +86,15 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und sucht sie wieder heraus
-	 * @throws SQLException
+	 * @throws Exception
 	 */
 	@Test
-	public void insertAndRetrieveValidEntity() throws SQLException {
+	public void insertAndRetrieveValidEntity() throws Exception {
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
 		Pferd testpferd2;
-		//das Pferd darf nicht enthalten sein
-		pferde = pferdDao.findAll();
-		assertThat( pferde.contains(testpferd), is(false));
-		pferdDao.insertPferd(testpferd);
-		//das Pferd muss enthalten sein
-		pferdDao.findAll();
-		assertThat( pferde.contains(testpferd), is(true));
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);
 		//nach dem Pferd wird gesucht, es wird zurückgegeben
 		testpferd2 = pferdDao.getPferd(testpferd);
 		//die zwei Pferde müssen gleich sein
@@ -99,21 +104,16 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und aktualisiert sie mit neuen Werten
-	 * @throws SQLException
+	 * @throws Exception
 	 */
 	@Test
-	public void insertAndUpdateValidEntity() throws SQLException {
+	public void insertAndUpdateValidEntity() throws Exception {
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
 		Pferd testpferd2 =  new Pferd(pferdDao.getNewId(), "Lizz", "/profil.jpg",
 				10.2, "HPV", "Haflinger", true, true);;
-		//das Pferd darf nicht enthalten sein
-		pferde = pferdDao.findAll();
-		assertThat( pferde.contains(testpferd), is(false));
-		pferdDao.insertPferd(testpferd);
-		//das Pferd muss enthalten sein
-		pferdDao.findAll();
-		assertThat( pferde.contains(testpferd), is(true));
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);
 		//das Pferd wird aktualisiert
 		testpferd.setTherapieart("HPV");
 		testpferd.setFoto("/profil.jpg");
@@ -129,10 +129,18 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank und
 	 * löscht sie wieder heraus
-	 * @throws SQLException
+	 * @throws Exception
 	 */
 	@Test
-	public void insertAndDeleteValidEntity() throws SQLException {
-		//TODO
+	public void insertAndDeleteValidEntity() throws Exception {
+		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);
+		//das Pferd wird gelöscht
+		pferdDao.deletePferd(testpferd);
+		//es darf nicht mehr enthalten sein
+		pferde = pferdDao.findAll();
+		assertThat( pferde.contains(testpferd), is(false));
 	}
 }
