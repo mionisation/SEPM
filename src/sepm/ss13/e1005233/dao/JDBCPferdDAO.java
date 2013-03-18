@@ -75,6 +75,14 @@ public class JDBCPferdDAO implements PferdDAO {
 		}
 		return pferde;
 	}
+	
+	/**
+	 * Gibt die Verbindung zur HSQLDB zurück
+	 * @return die Connection zur Datenbank
+	 */
+	public Connection getConnection() {
+		return c;
+	}
 
 
 }

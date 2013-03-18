@@ -80,4 +80,11 @@ public class Pferd {
 		return "" + id;
 	}
 	
+	public boolean equals(Pferd p) {
+		return id == p.getId() && name.equals(p.getName()) && foto.equals(p.getFoto()) &&
+				therapieart.equals(p.getTherapieart()) && rasse.equals(p.getRasse()) &&
+				preis == p.getPreis() && kinderfreundlich == p.isKinderfreundlich() &&
+				deleted == p.isDeleted();
+	}
+	
 }
