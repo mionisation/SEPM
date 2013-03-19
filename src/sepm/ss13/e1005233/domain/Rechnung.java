@@ -1,6 +1,7 @@
 package sepm.ss13.e1005233.domain;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Data Transfer Object zum Kapseln von Rechnungsinformationen
@@ -10,6 +11,7 @@ public class Rechnung {
 	private String name, zahlungsart;
 	private double gesamtpreis;
 	private int gesamtstunden, telefon;
+	private List<Buchung> buchungen;
 	
 	public Rechnung(Timestamp date) {
 		this.date = date;
@@ -52,6 +54,11 @@ public class Rechnung {
 	}
 	public void setTelefon(int telefon) {
 		this.telefon = telefon;
+	}
+	
+	
+	public void addBuchung(Buchung b) {
+		buchungen.add(b);
 	}
 	
 	public String toString() {

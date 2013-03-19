@@ -1,6 +1,5 @@
 package sepm.ss13.e1005233.dao;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import sepm.ss13.e1005233.domain.Pferd;
