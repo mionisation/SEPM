@@ -28,14 +28,14 @@ public abstract class PferdDAOTest {
 	 * Setzt das konkrete DAO, das getestet wird
 	 * @param pdao das zu testende PferdDAO
 	 */
-	public void setPferdDAO(PferdDAO pdao) {
+	protected void setPferdDAO(PferdDAO pdao) {
 		this.pferdDao = pdao;
 	}
 	
 	/**
-	 * Fügt ein Pferd in die 
-	 * @param p
-	 * @throws Exception
+	 * Fügt ein Pferd ein und überprüft ob es vorhanden ist 
+	 * @param p das einzufügende Pferd
+	 * @throws Exception wenn ein Fehler während des Einfügens auftritt
 	 */
 	public void insertPferdAndCheck(Pferd p) throws Exception {
 		//das Pferd darf nicht enthalten sein
@@ -50,7 +50,7 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test versucht eine Entität, die auf Null
 	 * referenziert, zu speichern. Das DAO muss eine Exception werfen.
-	 * @throws Exception 
+	 * @throws Exception soll geworfen werden
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void insertNullEntityThrowsException() throws Exception {
@@ -60,7 +60,7 @@ public abstract class PferdDAOTest {
 	
 	/**
 	 * Dieser Test speichert eine valide Entität ein
-	 * @throws Exception 
+	 * @throws Exception  wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
 	public void insertValidEntity() throws Exception {
@@ -73,7 +73,7 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test versucht eine Entität abzuspeichern, die den Wert null in Feldern hat,
 	 *  die nicht null sein dürfen. Die Datenbank muss eine Exception werfen
-	 *  @throws Exception
+	 *  @throws Exception soll geworfen werden
 	 */
 	@Test
 	public void insertNullArgumentEntityThrowsException() throws Exception {
@@ -86,7 +86,7 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und sucht sie wieder heraus
-	 * @throws Exception
+	 * @throws Exception wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
 	public void insertAndRetrieveValidEntity() throws Exception {
@@ -104,7 +104,7 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und aktualisiert sie mit neuen Werten
-	 * @throws Exception
+	 * @throws Exception wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
 	public void insertAndUpdateValidEntity() throws Exception {
@@ -129,7 +129,7 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank und
 	 * löscht sie wieder heraus
-	 * @throws Exception
+	 * @throws Exception wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
 	public void insertAndDeleteValidEntity() throws Exception {
