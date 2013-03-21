@@ -1,5 +1,6 @@
 package sepm.ss13.e1005233.domain;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -16,6 +17,8 @@ public class Rechnung {
 	public Rechnung(Timestamp date) {
 		this.date = date;
 	}
+	
+	
 	
 	//Getter und Setter zu den Informationen
 

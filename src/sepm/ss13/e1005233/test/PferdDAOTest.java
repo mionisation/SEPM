@@ -1,12 +1,15 @@
 package sepm.ss13.e1005233.test;
 
 import java.util.*;
+
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
 import sepm.ss13.e1005233.dao.PferdDAO;
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.exceptions.*;
 
 /**
  * Schablonenklasse, die spezifiziert, welche Tests für
@@ -17,6 +20,7 @@ public abstract class PferdDAOTest {
 	protected PferdDAO pferdDao;
 	protected Pferd testpferd;
 	protected List<Pferd> pferde;
+	private static final Logger log = Logger.getLogger(PferdDAOTest.class);
 	
 	public PferdDAOTest() {
 		this.pferdDao = null;
@@ -38,6 +42,7 @@ public abstract class PferdDAOTest {
 	 * @throws Exception wenn ein Fehler während des Einfügens auftritt
 	 */
 	public void insertPferdAndCheck(Pferd p) throws Exception {
+		log.debug("Führe insertPferdAndCheck-Test aus..." );
 		//das Pferd darf nicht enthalten sein
 		pferde = pferdDao.findAll();
 		assertThat( pferde.contains(p), is(false));
@@ -52,8 +57,9 @@ public abstract class PferdDAOTest {
 	 * referenziert, zu speichern. Das DAO muss eine Exception werfen.
 	 * @throws Exception soll geworfen werden
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = NullPointerException.class)
 	public void insertNullEntityThrowsException() throws Exception {
+		log.debug("Führe insertNullEntityThrowsException-Test aus..." );
 		testpferd= null;
 		pferdDao.insertPferd(testpferd);
 	}
@@ -64,6 +70,7 @@ public abstract class PferdDAOTest {
 	 */
 	@Test
 	public void insertValidEntity() throws Exception {
+		log.debug("Führe insertValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
 		//füge Pferd ein
@@ -75,8 +82,9 @@ public abstract class PferdDAOTest {
 	 *  die nicht null sein dürfen. Die Datenbank muss eine Exception werfen
 	 *  @throws Exception soll geworfen werden
 	 */
-	@Test
+	@Test(expected = PferdPersistenceException.class)
 	public void insertNullArgumentEntityThrowsException() throws Exception {
+		log.debug("Führe insertNullArgumentEntityThrowsException-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId());
 		testpferd.setTherapieart("Hippotherapie");
 		testpferd.setRasse("Lippizaner");
@@ -90,6 +98,7 @@ public abstract class PferdDAOTest {
 	 */
 	@Test
 	public void insertAndRetrieveValidEntity() throws Exception {
+		log.debug("Führe insertAndRetrieveValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
 		Pferd testpferd2;
@@ -108,6 +117,7 @@ public abstract class PferdDAOTest {
 	 */
 	@Test
 	public void insertAndUpdateValidEntity() throws Exception {
+		log.debug("Führe insertAndUpdateValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
 		Pferd testpferd2 =  new Pferd(pferdDao.getNewId(), "Lizz", "/profil.jpg",
@@ -133,6 +143,7 @@ public abstract class PferdDAOTest {
 	 */
 	@Test
 	public void insertAndDeleteValidEntity() throws Exception {
+		log.debug("Führe insertAndDeleteValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
 		//füge Pferd ein

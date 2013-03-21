@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.exceptions.JDBCPferdPersistenceException;
 
 /**
  * Stellt Methoden zum Austausch von Pferd-entitäten zu einer über JDBC
@@ -36,9 +37,11 @@ public class JDBCPferdDAO implements PferdDAO {
 	}
 	
 	@Override
-	public void insertPferd(Pferd p) throws SQLException {
+	public void insertPferd(Pferd p) throws JDBCPferdPersistenceException {
 		log.info("Beginne Einfügvorgang...");
 		log.debug("Füge Pferd ein mit Id " + p.getId());
+		
+		try {
 		pst = c.prepareStatement("INSERT INTO Pferde (id, name, foto, preis, therapieart, "
 				+"rasse, kinderfreundlich, deleted) VALUES (?,?,?,?,?,?,?,?)");
 		
@@ -52,14 +55,18 @@ public class JDBCPferdDAO implements PferdDAO {
 		pst.setBoolean(8,p.isDeleted());
 		pst.executeUpdate();
 		pst.close();
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
 		log.info("Einfügen abgeschlossen.");
 
 	}
 
 	@Override
-	public Pferd getPferd(Pferd p) throws SQLException {
+	public Pferd getPferd(Pferd p) throws JDBCPferdPersistenceException {
 		log.info("Beginne Rückgabevorgang...");
 		log.debug("Gebe Pferd zurück mit Id" + p.getId());
+		try {
 		pst = c.prepareStatement("SELECT * FROM Pferde WHERE ID = ?");
 		pst.setInt(1, p.getId());
 		result = pst.executeQuery();
@@ -70,13 +77,17 @@ public class JDBCPferdDAO implements PferdDAO {
 				result.getString("foto"), result.getDouble("preis"),
 				result.getString("therapieart"), result.getString("rasse"),
 				result.getBoolean("kinderfreundlich"), result.getBoolean("deleted"));
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
 	}
 
 	@Override
-	public void updatePferd(Pferd p) throws SQLException {
+	public void updatePferd(Pferd p) throws JDBCPferdPersistenceException {
 		log.info("Beginne Aktualisierungsvorgang...");
 		log.debug("Aktualisiere Pferd mit Id" + p.getId());
 		
+		try {
 		pst = c.prepareStatement("UPDATE Pferde SET name = ?, foto = ?, preis = ?, therapieart = ?, "
 				+"rasse = ?, kinderfreundlich = ?, deleted = ? WHERE id = ?");
 		
@@ -90,33 +101,52 @@ public class JDBCPferdDAO implements PferdDAO {
 		pst.setInt(8,p.getId());
 		pst.executeUpdate();
 		pst.close();
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
+		
 		log.info("Aktualisierung abgeschlossen.");
 		
 	}
 
 	@Override
-	public void deletePferd(Pferd p) throws SQLException {
+	public void deletePferd(Pferd p) throws JDBCPferdPersistenceException {
 		log.info("Beginne Löschvorgang...");
 		log.debug("Lösche Pferd mit Id" + p.getId());
+		
+		try {
 		pst = c.prepareStatement("DELETE FROM Pferde WHERE ID = ?");
 		pst.setInt(1, p.getId());
 		pst.executeUpdate();
 		pst.close();
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
 		log.info("Löschen abgeschlossen.");
 		
 		
 	}
 	
 	@Override
-	public int getNewId() throws SQLException {
+	public int getNewId() throws JDBCPferdPersistenceException {
+		int id;
+		log.info("Beginne Id Generierung...");
+		try {
 		result = st.executeQuery("SELECT COUNT(1) FROM PFERDE");
 		result.next();
-		return (result.getInt(1) + 1);
+		id = result.getInt(1) + 1;
+		log.debug("Gebe neue ID zurück mit Wert " + id);
+		return id;
+		} catch (SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
 	}
 
 
 	@Override
-	public List<Pferd> findAll() throws SQLException {
+	public List<Pferd> findAll() throws JDBCPferdPersistenceException {
+		log.info("Finde alle Pferde...");
+		try {
 		result = st.executeQuery("SELECT * FROM PFERDE");
 		ArrayList<Pferd> pferde = new ArrayList<Pferd>();
 		while(result.next()) {
@@ -125,7 +155,11 @@ public class JDBCPferdDAO implements PferdDAO {
 					result.getString("therapieart"), result.getString("rasse"),
 					result.getBoolean("kinderfreundlich"), result.getBoolean("deleted")));
 		}
+		log.debug("Gebe Liste aller gespeicherten Pferde zurück...");
 		return pferde;
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
 	}
 	
 	/**

@@ -4,6 +4,8 @@ import java.util.List;
 
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
+import sepm.ss13.e1005233.exceptions.PferdValidationException;
+import sepm.ss13.e1005233.exceptions.RechnungValidationException;
 
 /**
  * Dieses Interface lägt alle Methoden fest, die für eine
