@@ -27,6 +27,7 @@ public class JDBCService implements Service {
 			log.error("could not create PferdDAO");
 			e.printStackTrace();
 		}
+		log.debug("JDBCService erfolgreich erstellt!");
 	}
 	
 	/**
@@ -97,14 +98,30 @@ public class JDBCService implements Service {
 
 	@Override
 	public void deletePferd(Pferd p) {
-		// TODO Auto-generated method stub
+		log.info("Bereite Service zum Löschen vor...");
+		
+		try {
+			pferdDao.deletePferd(p);
+			log.debug("Service zum Löschen erfolgreich beendet!");
+		} catch (PferdPersistenceException e) {
+			log.error("Persistenz Error während Löschungsservice!");
+			e.printStackTrace();
+		}
 
 	}
 
 	@Override
 	public List<Pferd> findAllPferde() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Pferd> tl = null;
+		try {
+			tl = pferdDao.findAll();
+			log.debug("Service zur Rückgabe aller Pferde erfolgreich beendet!");
+		} catch (PferdPersistenceException e) {
+			log.error("Persistenz Error während Service zur Rückgabe aller Pferde!");
+			e.printStackTrace();
+		}
+		// TODO schänere Lösung? 
+		return tl;
 	}
 
 	@Override
