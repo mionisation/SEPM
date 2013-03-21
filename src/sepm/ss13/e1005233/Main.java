@@ -1,4 +1,5 @@
-package sepm.ss13.e1005233.service;
+package sepm.ss13.e1005233;
+
 
 import java.sql.*;
 
