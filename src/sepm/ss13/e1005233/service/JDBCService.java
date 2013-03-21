@@ -2,14 +2,25 @@ package sepm.ss13.e1005233.service;
 
 import java.util.List;
 
+import sepm.ss13.e1005233.dao.PferdDAO;
+import sepm.ss13.e1005233.dao.RechnungDAO;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 
 public class JDBCService implements Service {
 
+	private PferdDAO pferdDao;
+	private RechnungDAO rechnungDao;
+	
 	@Override
-	public void createPferd(Pferd p) throws PferdValidationException {
-		// TODO Auto-generated method stub
+	public void insertPferd(Pferd p) throws PferdValidationException {
+		
+		try {
+			pferdDao.insertPferd(p);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

@@ -16,7 +16,7 @@ public interface Service {
 	 * @param p das neue Pferd
 	 * @throws PferdValidationException wird bei unzulässigen Werten geworfen
 	 */
-	public void createPferd(Pferd p) throws PferdValidationException;
+	public void insertPferd(Pferd p) throws PferdValidationException;
 	
 	/**
 	 * Diese Methode erstellt eine neue Rechnung

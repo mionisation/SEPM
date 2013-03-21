@@ -54,4 +54,7 @@ public interface PferdDAO {
 	 * @throws Exception wird geworfen wenn ein Fehler beim Vorgang auftritt
 	 */
 	public List<Pferd> findAll() throws Exception;
+	
+	//TODO findby search horse
+	//TODO refactor Exceptions: PersistenceException, handle SQLExceptions in DAOs
 }
