@@ -7,6 +7,7 @@ import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.exceptions.RechnungValidationException;
+import sepm.ss13.e1005233.exceptions.SearchValidationException;
 
 /**
  * Dieses Interface lägt alle Methoden fest, die für eine
@@ -41,7 +42,7 @@ public interface Service {
 	 * @param sp ein Suchpferd mit Attributen nach denen gesucht werden soll
 	 * @return eine Liste mit passenden Pferden
 	 */
-	public List<Pferd> findBy(SuchPferd sp);
+	public List<Pferd> findBy(SuchPferd sp) throws SearchValidationException;
 	/**
 	 * Diese Methode aktualisiert ein Pferd
 	 * @param p das Pferd das aktualisiert werden soll

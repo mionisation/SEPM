@@ -8,12 +8,8 @@ import org.apache.log4j.Logger;
 import sepm.ss13.e1005233.dao.JDBCPferdDAO;
 import sepm.ss13.e1005233.dao.PferdDAO;
 import sepm.ss13.e1005233.dao.RechnungDAO;
-import sepm.ss13.e1005233.domain.Pferd;
-import sepm.ss13.e1005233.domain.Rechnung;
-import sepm.ss13.e1005233.domain.SuchPferd;
-import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
-import sepm.ss13.e1005233.exceptions.PferdValidationException;
-import sepm.ss13.e1005233.exceptions.RechnungValidationException;
+import sepm.ss13.e1005233.domain.*;
+import sepm.ss13.e1005233.exceptions.*;
 
 public class JDBCService implements Service {
 
@@ -80,8 +76,21 @@ public class JDBCService implements Service {
 		return null;
 	}
 	
-	//TODO implementieren
-	public List<Pferd> findBy(SuchPferd sp) {
+	public List<Pferd> findBy(SuchPferd sp) throws SearchValidationException {
+		log.info("Bereite Service zum Suchen vor...");
+		
+		if( (sp.getMaxpreis() < sp.getMinpreis()) && sp.getMaxpreis() < 0 && sp.getMinpreis() < 0 &&
+				!(sp.getTherapieart().equals("HPR") || sp.getTherapieart().equals("HPV") ||
+						sp.getTherapieart().equals("Hippotherapie"))) {
+			log.error("Suchdaten inkorrekt!");
+			throw new SearchValidationException();
+		}
+		try {
+			return pferdDao.findBy(sp);
+		} catch (PferdPersistenceException e) {
+			log.error("Persistenz Error während Suchservice!");
+			e.printStackTrace();
+		}
 		return null;
 	}
 

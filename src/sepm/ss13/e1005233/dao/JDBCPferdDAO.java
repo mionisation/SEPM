@@ -194,10 +194,16 @@ public class JDBCPferdDAO implements PferdDAO {
 			set = true;
 		}
 		//TODO vielleicht ist sowas notwendig  CAST(1.0000 AS NUMERIC(13, 2))
-		if(sp.getMaxpreis() > 0 && sp.getMinpreis() > 0 && sp.getMaxpreis() > sp.getMinpreis()) {
+		if(sp.getMinpreis() > 0) {
 			if(set)
 				statement += " AND ";
-			statement += "PREIS > " + sp.getMinpreis() + "AND PREIS < " + sp.getMaxpreis();
+			statement += "PREIS > " + sp.getMinpreis();
+			set = true;
+		}
+		if(sp.getMaxpreis() > 0) {
+			if(set)
+				statement += " AND ";
+			statement +=" PREIS < " + sp.getMaxpreis();
 			set = true;
 		}
 		if(sp.getRasse() != null && !sp.getRasse().isEmpty()) {
