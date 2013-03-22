@@ -182,7 +182,6 @@ public class JDBCPferdDAO implements PferdDAO {
 	 * angegebenen Suchpferd
 	 * @param sp das Suchpferd mit den gesuchten Attributen
 	 * @return eine SQL-SELECT-Abfrage die nach den gewünschten Attributen sucht
-	 *TODO Fertigmachen
 	 */
 	private String getSQLStatement(SuchPferd sp) {
 		log.info("Generiere SQL-Statement...");
@@ -193,7 +192,6 @@ public class JDBCPferdDAO implements PferdDAO {
 			statement += "NAME = '" + sp.getName() + "' ";
 			set = true;
 		}
-		//TODO vielleicht ist sowas notwendig  CAST(1.0000 AS NUMERIC(13, 2))
 		if(sp.getMinpreis() > 0) {
 			if(set)
 				statement += " AND ";
