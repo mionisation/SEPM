@@ -1,41 +1,35 @@
+//package sepm.ss13.e1005233;
+//
+//import javax.swing.*;        
+//
+//import sepm.ss13.e1005233.gui.MainFrame;
+//
+//public class Main {
+//    /**
+//     * Create the GUI and show it.  For thread safety,
+//     * this method should be invoked from the
+//     * event-dispatching thread.
+//     */
+//    private static void createAndShowGUI() {
+//        //Create and set up the window.
+//        MainFrame frame = new MainFrame();
+//        frame.create();
+//    }
+//
+//    public static void main(String[] args) {
+//        //Schedule a job for the event-dispatching thread:
+//        //creating and showing this application's GUI.
+//        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                createAndShowGUI();
+//            }
+//        });
+//    }
+//}
+
+
+
 package sepm.ss13.e1005233;
-
-import javax.swing.*;        
-
-public class Main {
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-    private static void createAndShowGUI() {
-        //Create and set up the window.
-        JFrame frame = new JFrame("HelloWorldSwing");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Add the ubiquitous "Hello World" label.
-        JLabel label = new JLabel("Hello World");
-        frame.getContentPane().add(label);
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
-}
-
-
-
-/*package sepm.ss13.e1005233;
 
 
 import java.sql.*;
@@ -56,12 +50,7 @@ public class Main {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		
-		
-		
-		
-		
-		
+
 		try {
 			Statement demo = c.createStatement();
 			ResultSet result = demo.executeQuery("SELECT * FROM PFERDE");
@@ -85,4 +74,4 @@ public class Main {
 	}
 	
 
-}*/
+}

@@ -3,6 +3,7 @@ package sepm.ss13.e1005233.dao;
 import java.util.List;
 
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 
 /**
@@ -20,7 +21,7 @@ public interface PferdDAO {
 	
 	/**
 	 * Gibt das durch die id spezifizierte Pferd zurück
-	 * @param id der eindeutige Key zur Identifikation
+	 * @param p das Pferd mit dem eindeutigen Key
 	 * @return das Pferd mit der angegebenen Id
 	 * @throws Exception wird geworfen wenn ein Fehler bei der Rückgabe auftritt
 	 */
@@ -56,5 +57,11 @@ public interface PferdDAO {
 	 */
 	public List<Pferd> findAll() throws PferdPersistenceException;
 	
-	//TODO findby search horse
+	/**
+	 * Gibt eine Liste aller Pferde zurück, die den Kriterien des Such-Pferds
+	 * entsprechen
+	 * @param sh ein Suchpferd mit erwünschten Attributen
+	 * @return eine Liste aller den Suchkriterien entsprechenden Pferde
+	 */
+	public List<Pferd> findBy(SuchPferd sp) throws PferdPersistenceException;
 }

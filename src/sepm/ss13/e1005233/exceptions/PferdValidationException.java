@@ -5,8 +5,6 @@ package sepm.ss13.e1005233.exceptions;
  */
 public class PferdValidationException extends IllegalArgumentException {
 
-	private static final long serialVersionUID = -3533842186978175817L;
-
 	public PferdValidationException() {
 		super();
 	}

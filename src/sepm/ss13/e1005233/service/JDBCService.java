@@ -10,6 +10,7 @@ import sepm.ss13.e1005233.dao.PferdDAO;
 import sepm.ss13.e1005233.dao.RechnungDAO;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
+import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.exceptions.RechnungValidationException;
@@ -76,6 +77,11 @@ public class JDBCService implements Service {
 			e.printStackTrace();
 		}
 		//TODO find better solution for exception handling
+		return null;
+	}
+	
+	//TODO implementieren
+	public List<Pferd> findBy(SuchPferd sp) {
 		return null;
 	}
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
+import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.exceptions.RechnungValidationException;
 
@@ -34,6 +35,13 @@ public interface Service {
 	 */
 	public Pferd getPferd(Pferd p);
 	
+	/**
+	 * Diese Methode gibt eine Liste von Pferden zurück, die den
+	 * Kriterien im Suchpferd entsprechen
+	 * @param sp ein Suchpferd mit Attributen nach denen gesucht werden soll
+	 * @return eine Liste mit passenden Pferden
+	 */
+	public List<Pferd> findBy(SuchPferd sp);
 	/**
 	 * Diese Methode aktualisiert ein Pferd
 	 * @param p das Pferd das aktualisiert werden soll

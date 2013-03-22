@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.*;
 
 import sepm.ss13.e1005233.dao.PferdDAO;
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.*;
 
 /**
@@ -18,13 +19,15 @@ import sepm.ss13.e1005233.exceptions.*;
  */
 public abstract class PferdDAOTest {
 	protected PferdDAO pferdDao;
-	protected Pferd testpferd;
+	protected Pferd testpferd, testpferd2, testpferd3;
 	protected List<Pferd> pferde;
 	private static final Logger log = Logger.getLogger(PferdDAOTest.class);
 	
 	public PferdDAOTest() {
 		this.pferdDao = null;
 		this.testpferd = null;
+		this.testpferd2 = null;
+		this.testpferd3 = null;
 		this.pferde = new ArrayList<Pferd>();
 	}
 	
@@ -39,9 +42,9 @@ public abstract class PferdDAOTest {
 	/**
 	 * Fügt ein Pferd ein und überprüft ob es vorhanden ist 
 	 * @param p das einzufügende Pferd
-	 * @throws Exception wenn ein Fehler während des Einfügens auftritt
+	 * @throws PferdPersistenceException wenn ein Fehler während des Einfügens auftritt
 	 */
-	public void insertPferdAndCheck(Pferd p) throws Exception {
+	public void insertPferdAndCheck(Pferd p) throws PferdPersistenceException {
 		log.debug("Führe insertPferdAndCheck-Test aus..." );
 		//das Pferd darf nicht enthalten sein
 		pferde = pferdDao.findAll();
@@ -66,10 +69,10 @@ public abstract class PferdDAOTest {
 	
 	/**
 	 * Dieser Test speichert eine valide Entität ein
-	 * @throws Exception  wenn ein Fehler während des Tests auftritt
+	 * @throws PferdPersistenceException  wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
-	public void insertValidEntity() throws Exception {
+	public void insertValidEntity() throws PferdPersistenceException {
 		log.debug("Führe insertValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
@@ -79,11 +82,11 @@ public abstract class PferdDAOTest {
 	
 	/**
 	 * Dieser Test versucht eine Entität abzuspeichern, die den Wert null in Feldern hat,
-	 *  die nicht null sein dürfen. Die Datenbank muss eine Exception werfen
-	 *  @throws Exception soll geworfen werden
+	 *  die nicht null sein dürfen. Die Datenbank muss eine PferdPersistenceException werfen
+	 *  @throws PferdPersistenceException soll geworfen werden
 	 */
 	@Test(expected = PferdPersistenceException.class)
-	public void insertNullArgumentEntityThrowsException() throws Exception {
+	public void insertNullArgumentEntityThrowsException() throws PferdPersistenceException {
 		log.debug("Führe insertNullArgumentEntityThrowsException-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId());
 		testpferd.setTherapieart("Hippotherapie");
@@ -94,10 +97,10 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und sucht sie wieder heraus
-	 * @throws Exception wenn ein Fehler während des Tests auftritt
+	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
-	public void insertAndRetrieveValidEntity() throws Exception {
+	public void insertAndRetrieveValidEntity() throws PferdPersistenceException {
 		log.debug("Führe insertAndRetrieveValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
@@ -113,10 +116,11 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und aktualisiert sie mit neuen Werten
+	 * @throws PferdPersistenceException 
 	 * @throws Exception wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
-	public void insertAndUpdateValidEntity() throws Exception {
+	public void insertAndUpdateValidEntity() throws PferdPersistenceException {
 		log.debug("Führe insertAndUpdateValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
@@ -139,10 +143,10 @@ public abstract class PferdDAOTest {
 	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank und
 	 * löscht sie wieder heraus
-	 * @throws Exception wenn ein Fehler während des Tests auftritt
+	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt
 	 */
 	@Test
-	public void insertAndDeleteValidEntity() throws Exception {
+	public void insertAndDeleteValidEntity() throws PferdPersistenceException  {
 		log.debug("Führe insertAndDeleteValidEntity-Test aus..." );
 		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
 				10.2, "HPR", "Haflinger", true, false);
@@ -153,5 +157,34 @@ public abstract class PferdDAOTest {
 		//es darf nicht mehr enthalten sein
 		pferde = pferdDao.findAll();
 		assertThat( pferde.contains(testpferd), is(false));
+	}
+	
+	//TODO find by tests
+	/**
+	 * Dieser Test speichert ein paar Entitäten in die Datenbank und
+	 * versucht sie über eine Suchanfrage über Name, Rasse und Kinderfreundlichkeit herauszubekommen
+	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt
+	 */
+	@Test
+	public void insertAndRetrieveByNameRaceChildfriendly() throws PferdPersistenceException {
+		log.debug("Führe insertAndRetrieveByNameRaceChildfriendly-Test aus...");
+		//erstelle Pferde und füge sie ein
+		testpferd = new Pferd(pferdDao.getNewId(), "Rolfi", "/bild.jpg",
+				10.2, "HPR", "Schimmel", true, false);
+		insertPferdAndCheck(testpferd);
+		testpferd2 = new Pferd(pferdDao.getNewId(), "Rolfi", "/bild.jpg",
+				10.2, "HPR", "Schimmel", true, false);
+		insertPferdAndCheck(testpferd2);
+		testpferd3 = new Pferd(pferdDao.getNewId(), "Rolfi", "/bild.jpg",
+				10.2, "HPR", "Haflinger", false, false);
+		insertPferdAndCheck(testpferd3);
+
+		//erstelle neues Suchpferd und suche mit jenem nach Pferden
+		SuchPferd sp = new SuchPferd("Rolfi", null, "Schimmel", 0, 0, true);
+		pferde = pferdDao.findBy(sp);
+		//Pferde müssen enthalten sein
+		assertThat(pferde.contains(testpferd), is(true));
+		assertThat(pferde.contains(testpferd2), is(true));
+		
 	}
 }

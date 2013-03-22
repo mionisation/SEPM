@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.JDBCPferdPersistenceException;
 
 /**
@@ -115,8 +116,9 @@ public class JDBCPferdDAO implements PferdDAO {
 		log.debug("Lösche Pferd mit Id" + p.getId());
 		
 		try {
-		pst = c.prepareStatement("DELETE FROM Pferde WHERE ID = ?");
-		pst.setInt(1, p.getId());
+		pst = c.prepareStatement("UPDATE Pferde SET deleted = ? WHERE id = ?");
+		pst.setBoolean(1, true);
+		pst.setInt(2, p.getId());
 		pst.executeUpdate();
 		pst.close();
 		} catch(SQLException e) {
@@ -148,15 +150,8 @@ public class JDBCPferdDAO implements PferdDAO {
 		log.info("Finde alle Pferde...");
 		try {
 		result = st.executeQuery("SELECT * FROM PFERDE");
-		ArrayList<Pferd> pferde = new ArrayList<Pferd>();
-		while(result.next()) {
-			pferde.add(new Pferd(result.getInt("id"), result.getString("name"),
-					result.getString("foto"), result.getDouble("preis"),
-					result.getString("therapieart"), result.getString("rasse"),
-					result.getBoolean("kinderfreundlich"), result.getBoolean("deleted")));
-		}
 		log.debug("Gebe Liste aller gespeicherten Pferde zurück...");
-		return pferde;
+		return genPferdList(result);
 		} catch(SQLException e) {
 			throw new JDBCPferdPersistenceException();
 		}
@@ -170,5 +165,76 @@ public class JDBCPferdDAO implements PferdDAO {
 		return c;
 	}
 
+	@Override
+	public List<Pferd> findBy(SuchPferd sp) throws JDBCPferdPersistenceException {
+		log.info("Finde alle Pferde die den Suchkriterien entsprechen...");
+		try {
+		result = st.executeQuery(getSQLStatement(sp));
+		log.debug("Gebe Liste der den Suchkriterien entsprechenden Pferde zurück...");
+		return genPferdList(result);
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
+	}
+
+	/**
+	 * Diese Methode generiert ein passendes SQL-Statement aus einem
+	 * angegebenen Suchpferd
+	 * @param sp das Suchpferd mit den gesuchten Attributen
+	 * @return eine SQL-SELECT-Abfrage die nach den gewünschten Attributen sucht
+	 *TODO Fertigmachen
+	 */
+	private String getSQLStatement(SuchPferd sp) {
+		log.info("Generiere SQL-Statement...");
+		boolean set = false;
+		String statement = "SELECT * FROM PFERDE WHERE ";
+		
+		if(sp.getName() != null && !sp.getName().isEmpty()) {
+			statement += "NAME = '" + sp.getName() + "' ";
+			set = true;
+		}
+		//TODO vielleicht ist sowas notwendig  CAST(1.0000 AS NUMERIC(13, 2))
+		if(sp.getMaxpreis() > 0 && sp.getMinpreis() > 0 && sp.getMaxpreis() > sp.getMinpreis()) {
+			if(set)
+				statement += " AND ";
+			statement += "PREIS > " + sp.getMinpreis() + "AND PREIS < " + sp.getMaxpreis();
+			set = true;
+		}
+		if(sp.getRasse() != null && !sp.getRasse().isEmpty()) {
+			if(set)
+				statement += " AND ";
+			statement += "RASSE ='" + sp.getRasse() + "' ";
+			set = true;
+		}
+		if(sp.getTherapieart() != null && !sp.getTherapieart().isEmpty()) {
+			if(set)
+				statement += " AND ";
+			statement += "AND THERAPIEART ='" + sp.getTherapieart() + "' ";
+			set = true;
+		}
+		if(set) {
+			statement += " AND ";
+		}
+		//es sollen nur nicht gelöschte Pferde gefunden werden
+		statement += "DELETED = FALSE AND KINDERFREUNDLICH = " + sp.isKinderfreundlich();
+		statement += ";";
+		log.debug("SQL-Statement generiert: " + statement);
+		return statement;
+	}
+
+	public List<Pferd> genPferdList(ResultSet set) throws JDBCPferdPersistenceException {
+		ArrayList<Pferd> pferde = new ArrayList<Pferd>();
+		try {
+			while(set.next()) {
+				pferde.add(new Pferd(set.getInt("id"), set.getString("name"),
+						set.getString("foto"), set.getDouble("preis"),
+						set.getString("therapieart"), set.getString("rasse"),
+						set.getBoolean("kinderfreundlich"), set.getBoolean("deleted")));
+			}
+		} catch (SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
+		return pferde;
+	}
 
 }
