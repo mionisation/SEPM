@@ -62,6 +62,12 @@ public interface Service {
 	public List<Pferd> findAllPferde();
 	
 	/**
+	 * Diese Methode gibt alle Pferde zurück
+	 * @return eine Liste aller gespeicherten Pferde
+	 */
+	public List<Pferd> findAllUndeletedPferde();
+	
+	/**
 	 * Diese Methode gibt die drei beliebtesten Pferde zurück
 	 * @return eine Liste der drei beliebtesten Pferde
 	 */

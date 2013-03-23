@@ -76,6 +76,7 @@ public class JDBCService implements Service {
 		return null;
 	}
 	
+	@Override
 	public List<Pferd> findBy(SuchPferd sp) throws SearchValidationException {
 		log.info("Bereite Service zum Suchen vor...");
 		
@@ -138,6 +139,21 @@ public class JDBCService implements Service {
 		// TODO schänere Lösung? 
 		return tl;
 	}
+	
+	@Override
+	public List<Pferd> findAllUndeletedPferde() {
+		List<Pferd> tl = null;
+		try {
+			tl = pferdDao.findAllUndeleted();
+			log.debug("Service zur Rückgabe aller nicht gelöschten Pferde erfolgreich beendet!");
+		} catch (PferdPersistenceException e) {
+			log.error("Persistenz Error während Service zur Rückgabe aller nicht gelöschten Pferde!");
+			e.printStackTrace();
+		}
+		// TODO schänere Lösung? 
+		return tl;
+	}
+	
 
 	@Override
 	public List<Pferd> getPopularPferde() {

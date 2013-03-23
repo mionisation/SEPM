@@ -156,6 +156,19 @@ public class JDBCPferdDAO implements PferdDAO {
 			throw new JDBCPferdPersistenceException();
 		}
 	}
+
+	@Override
+	public List<Pferd> findAllUndeleted() throws JDBCPferdPersistenceException {
+		log.info("Finde alle nicht gelöschten Pferde...");
+		try {
+		result = st.executeQuery("SELECT * FROM PFERDE WHERE DELETED = false");
+		log.debug("Gebe Liste aller gespeicherten und nicht gelöschten Pferde zurück...");
+		return genPferdList(result);
+		} catch(SQLException e) {
+			throw new JDBCPferdPersistenceException();
+		}
+	}
+	
 	
 	/**
 	 * Gibt die Verbindung zur HSQLDB zurück

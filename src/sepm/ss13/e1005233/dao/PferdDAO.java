@@ -58,6 +58,13 @@ public interface PferdDAO {
 	public List<Pferd> findAll() throws PferdPersistenceException;
 	
 	/**
+	 * Gibt eine Liste aller gespeicherten und nicht 'gelöschten' Pferde zurück
+	 * @return eine Liste der gespeicherten und nicht gelöschten Pferde
+	 * @throws Exception wird geworfen wenn ein Fehler beim Vorgang auftritt
+	 */
+	public List<Pferd> findAllUndeleted() throws PferdPersistenceException;
+	
+	/**
 	 * Gibt eine Liste aller Pferde zurück, die den Kriterien des Such-Pferds
 	 * entsprechen
 	 * @param sh ein Suchpferd mit erwünschten Attributen

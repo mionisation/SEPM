@@ -17,8 +17,8 @@ public class MainFrame extends JFrame{
         tabs.addTab("Rechnungen", rechnungen);
         add(tabs);
         //Display the window.
-        //pack();
-        setSize(300, 300);
+        pack();
+        //setSize(300, 300);
         setVisible(true);
 	}
 }
