@@ -4,9 +4,9 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
-public class PferdPanel extends JPanel{
+public class RechnungPanel extends JPanel{
 
-	public PferdPanel() {
+	public RechnungPanel() {
 		super(new MigLayout());
 	}
 
