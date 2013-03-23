@@ -2,12 +2,12 @@ package sepm.ss13.e1005233.gui;
 
 import javax.swing.JTable;
 
-public class PferdTable extends JTable{
-	public PferdTable(Object[][] data, String[] columnNames) {
+public class CustomTable extends JTable{
+	public CustomTable(Object[][] data, String[] columnNames) {
 		super(data, columnNames);
 	}
 
-	public PferdTable() {
+	public CustomTable() {
 		super();
 	}
 

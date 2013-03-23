@@ -8,7 +8,7 @@ public class MainFrame extends JFrame{
 
 	public void create() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Pferdetherapiemanager 2013");
+        setTitle("Pferdetherapie Manager 2013");
         
         JTabbedPane tabs = new JTabbedPane();
         PferdPanel pferde = new PferdPanel();

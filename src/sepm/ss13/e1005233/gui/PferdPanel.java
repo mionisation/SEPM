@@ -16,26 +16,42 @@ import net.miginfocom.swing.MigLayout;
 public class PferdPanel extends JPanel{
 
 	private Service service;
-	private JScrollPane scrollpane;
+	private JScrollPane scrollpanepferd;
+	private JScrollPane scrollpaneaktiv;
 	private JTable pferde;
+	private JTable aktiv;
 	private JButton deleteButton;
-	private JButton addButton;
-	private String[] columnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Kinderfreundlich"};
+	private JButton addRechnungButton;
+	private JButton addPferdButton;
+	private String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Kinderfreundlich"};
+	private String[] aktivColumnNames = {"ID#", "Name", "Preis", "Stunden"};
 	public PferdPanel() {
 		super(new MigLayout());
 				
 		//Erstelle Pferdetabelle, uneditierbar
 		service = new JDBCService();
-		pferde = new PferdTable(updateTable(), columnNames);
-		scrollpane = new JScrollPane(pferde);
-		add(scrollpane);
 		
-		addButton = new JButton();
-		addButton.setText("Pferd hinzufügen...");
-		add(addButton);
+		pferde = new CustomTable(updateTable(), pferdColumnNames);
+		scrollpanepferd = new JScrollPane(pferde);
+		add(scrollpanepferd);
+		
+		addPferdButton = new JButton();
+		addPferdButton.setText("Pferd hinzufügen...");
+		add(addPferdButton);
+		
+		addRechnungButton = new JButton();
+		addRechnungButton.setText("Neue Rechnung erstellen...");
+		add(addRechnungButton);
+		
 		deleteButton = new JButton();
 		deleteButton.setText("Pferd löschen");
 		add(deleteButton);
+		
+		//TODO: wieder removen wäre eigentlich nice
+		Object[][] temp = {};
+		aktiv = new CustomTable(temp, aktivColumnNames);
+		scrollpaneaktiv = new JScrollPane(aktiv);
+		add(scrollpaneaktiv);
 		
 	}
 	

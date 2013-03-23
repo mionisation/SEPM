@@ -63,6 +63,9 @@ public class Rechnung {
 	public void addBuchung(Buchung b) {
 		buchungen.add(b);
 	}
+	public List<Buchung> getBuchungen() {
+		return buchungen;
+	}
 	
 	public String toString() {
 		return date.toString();
