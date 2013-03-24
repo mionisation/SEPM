@@ -180,7 +180,7 @@ public abstract class PferdDAOTest {
 		insertPferdAndCheck(testpferd3);
 
 		//erstelle neues Suchpferd und suche mit jenem nach Pferden
-		SuchPferd sp = new SuchPferd("Rolfi", null, "Schimmel", 0, 0, true);
+		SuchPferd sp = new SuchPferd("Rolfi", null, "Schimmel", 0, 0, "TRUE");
 		pferde = pferdDao.findBy(sp);
 		//Pferde müssen enthalten sein
 		assertThat(pferde.contains(testpferd), is(true));

@@ -4,10 +4,10 @@ public class SuchPferd {
 	
 	private String name, therapieart, rasse;
 	private double minpreis, maxpreis;
-	private boolean kinderfreundlich;
+	private String kinderfreundlich;
 	
 	public SuchPferd(String name, String therapieart, String rasse,
-					double minpreis, double maxpreis, boolean kinderfreundlich) {
+					double minpreis, double maxpreis, String kinderfreundlich) {
 		this.name = name;
 		this.therapieart = therapieart;
 		this.rasse = rasse;
@@ -56,11 +56,11 @@ public class SuchPferd {
 		this.maxpreis = maxpreis;
 	}
 
-	public boolean isKinderfreundlich() {
+	public String isKinderfreundlich() {
 		return kinderfreundlich;
 	}
 
-	public void setKinderfreundlich(boolean kinderfreundlich) {
+	public void setKinderfreundlich(String kinderfreundlich) {
 		this.kinderfreundlich = kinderfreundlich;
 	}
 }

@@ -14,11 +14,11 @@ public class MainFrame extends JFrame{
         PferdPanel pferde = new PferdPanel();
         RechnungPanel rechnungen = new RechnungPanel();
         tabs.addTab("Pferdeliste", pferde);
+        setJMenuBar(pferde.getJMenuBar());
         tabs.addTab("Rechnungen", rechnungen);
         add(tabs);
         //Display the window.
         pack();
-        //setSize(300, 300);
         setVisible(true);
 	}
 }

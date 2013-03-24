@@ -226,15 +226,24 @@ public class JDBCPferdDAO implements PferdDAO {
 		if(sp.getTherapieart() != null && !sp.getTherapieart().isEmpty()) {
 			if(set)
 				statement += " AND ";
-			statement += "AND THERAPIEART ='" + sp.getTherapieart() + "' ";
+			statement += "THERAPIEART ='" + sp.getTherapieart() + "' ";
 			set = true;
 		}
+		if(sp.isKinderfreundlich() != null && !sp.isKinderfreundlich().isEmpty()) {
+			if(set)
+				statement += " AND ";
+			statement += "KINDERFREUNDLICH ='" + sp.isKinderfreundlich() + "' ";
+			set = true;
+		}		
 		if(set) {
 			statement += " AND ";
 		}
 		//es sollen nur nicht gelöschte Pferde gefunden werden
-		statement += "DELETED = FALSE AND KINDERFREUNDLICH = " + sp.isKinderfreundlich();
+		statement += "DELETED = FALSE";
 		statement += ";";
+		//Wenn keine Eingaben gemacht wurden, werden alle Pferde zurückgegeben
+		if(!set)
+			statement = "SELECT * FROM PFERDE WHERE DELETED = FALSE";
 		log.debug("SQL-Statement generiert: " + statement);
 		return statement;
 	}
