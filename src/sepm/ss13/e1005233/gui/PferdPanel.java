@@ -1,6 +1,8 @@
 package sepm.ss13.e1005233.gui;
 
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,16 +21,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.service.JDBCService;
 import sepm.ss13.e1005233.service.Service;
 
 import net.miginfocom.swing.MigLayout;
 
-public class PferdPanel extends JPanel{
+public class PferdPanel extends JPanel implements ActionListener{
 
 	private Service service;
 	private JScrollPane scrollpanepferd, scrollpaneaktiv;
@@ -39,30 +44,37 @@ public class PferdPanel extends JPanel{
 	private JComboBox<String> therapieAuswahl, kinderAuswahl;
 	private JMenuBar menuBar;
 	private JMenu menu;
-	private JTextField textField;
+	private JFrame parent;
+	private CustomTable ctm;
+	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField;
 	private JMenuItem menuItem;
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Kinderfreundlich"};
 	private final String[] aktivColumnNames = {"ID#", "Name", "Preis", "Stunden"};
 	private static final Logger log = Logger.getLogger(PferdPanel.class);
-	public PferdPanel() {
+	public PferdPanel(JFrame parent) {
 		super(new MigLayout());
-				
-		service = new JDBCService();
+		log.debug("Erstelle neues PferdPanel...");
 		
+		service = new JDBCService();
+		this.parent = parent;
 		//erstelle Menu
 		menuBar = new JMenuBar();
 		menu = new JMenu("Aktionen");
 		menuBar.add(menu);
 		menuItem = new JMenuItem("Neues Pferd...");
 		menu.add(menuItem);
+		
 		menuItem = new JMenuItem("Neue Rechnung...");
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand("NeueRechnung");
 		menu.add(menuItem);
+		
 		menuItem = new JMenuItem("Hilfe");
 		menu.add(menuItem);
 		menuItem = new JMenuItem("Beenden");
-		menu.add(menuItem);		
+		menu.add(menuItem);	
 		
 		//erstelle Suchpanel
 		suchPanel = new JPanel(new MigLayout());
@@ -70,22 +82,24 @@ public class PferdPanel extends JPanel{
 		
 		descSearch = new JLabel("Name:      ");
 		suchPanel.add(descSearch, "split 2");
-		textField = new JTextField(13);
-		suchPanel.add(textField, "wrap");
+		nameTextField = new JTextField(13);
+		suchPanel.add(nameTextField, "wrap");
 		
 		descSearch = new JLabel("Rasse:     ");
 		suchPanel.add(descSearch, "split 2");
-		textField = new JTextField(13);
-		suchPanel.add(textField, "wrap");
+		rasseTextField = new JTextField(13);
+		suchPanel.add(rasseTextField, "wrap");
 		
 		descSearch = new JLabel("Preis:        Von");
 		suchPanel.add(descSearch, "split 4");
-		textField = new JTextField(4);
-		suchPanel.add(textField, "span");
+		preisVonTextField = new JTextField(4);
+		preisVonTextField.setText("0");
+		suchPanel.add(preisVonTextField, "span");
 		descSearch = new JLabel("bis");
 		suchPanel.add(descSearch);
-		textField = new JTextField(4);
-		suchPanel.add(textField, "wrap");
+		preisBisTextField = new JTextField(4);
+		preisBisTextField.setText("0");
+		suchPanel.add(preisBisTextField, "wrap");
 		
 		descSearch = new JLabel("Therapieart:");
 		suchPanel.add(descSearch, "wrap");
@@ -99,10 +113,13 @@ public class PferdPanel extends JPanel{
 		suchPanel.add(kinderAuswahl, "wrap");
 		therapieAuswahl.setSelectedIndex(0);
 				
-		//TODO reset button
 		suchButton = new JButton("Suchen");
+		suchButton.setActionCommand("SUCHEN");
+		suchButton.addActionListener(this);
 		suchPanel.add(suchButton, "split 2");
 		resetButton = new JButton("Reset");
+		resetButton.setActionCommand("RESET");
+		resetButton.addActionListener(this);
 		suchPanel.add(resetButton, "wrap");
 		
 		//erstelle Pferd-profilbild
@@ -120,7 +137,8 @@ public class PferdPanel extends JPanel{
 		add(deleteButton, "wrap, gaptop 5");
 				
 		//Erstelle Pferdetabelle, uneditierbar
-		pferde = new CustomTable(updateTable(), pferdColumnNames);
+		ctm = new CustomTable(updateTable(service.findAllUndeletedPferde()), pferdColumnNames);
+		pferde = new JTable(ctm);
 		scrollpanepferd = new JScrollPane(pferde);
 		add(scrollpanepferd);
 		
@@ -132,22 +150,23 @@ public class PferdPanel extends JPanel{
 		neuRechnungPanel.add(addZuRechnungButton, "split 2");
 		
 		rechnungSpeichernButton = new JButton("Rechnung speichern");
+		rechnungSpeichernButton.addActionListener(this);
+		rechnungSpeichernButton.setActionCommand("RechnungSpeichern");
 		neuRechnungPanel.add(rechnungSpeichernButton, "wrap");
 		
-		//TODO: wieder removen wäre eigentlich nice
 		Object[][] temp = {};
-		aktiv = new CustomTable(temp, aktivColumnNames);
+		aktiv = new JTable(new CustomTable(temp, aktivColumnNames));
 		scrollpaneaktiv = new JScrollPane(aktiv);
 		neuRechnungPanel.add(scrollpaneaktiv);
 		add(neuRechnungPanel, "dock east");
-
+		removeRechnung();
 	}
 	
-	public Object[][] updateTable(){
-		List<Pferd> allPferdeList =	service.findAllUndeletedPferde();
-		Object[][] allPferdeArray = new Object[allPferdeList.size()][6];
+	public Object[][] updateTable(List<Pferd> pferdeList){
+		log.debug("Aktualisiere Tabelle mit Pferden...");
+		Object[][] allPferdeArray = new Object[pferdeList.size()][6];
 		int i = 0;
-		for(Pferd p : allPferdeList) {
+		for(Pferd p : pferdeList) {
 			allPferdeArray[i][0] = p.getId();
 			allPferdeArray[i][1] = p.getName();
 			allPferdeArray[i][2] = p.getPreis();
@@ -160,8 +179,12 @@ public class PferdPanel extends JPanel{
 		return allPferdeArray;
 	}
 	
+	/**
+	 * Ändert das angezeigte Bild mit dem in path angegebenen.
+	 * @param path der Dateipfad zum Bild
+	 */
 	public void setPferdIcon(String path) {
-		
+		log.info("Bereite Änderung vom Bild vor...");
 		BufferedImage myPicture = null;
 		Image im = null;
 		//reset Text and Icon
@@ -172,24 +195,106 @@ public class PferdPanel extends JPanel{
 			myPicture = ImageIO.read(new File(path));
 			log.debug("Image size is " + myPicture.getWidth() + " x " + myPicture.getHeight());
 			im = myPicture.getScaledInstance(200, (int) (200 * ((double)myPicture.getHeight()/myPicture.getWidth())), Image.SCALE_SMOOTH);
+			log.info("Bild vom Pferd geladen!");
 			picPferd.setIcon(new ImageIcon(im));
 		} catch (IOException e) {
+			log.info("Kein zugehöriges Bild zum Pferd gespeichert!");
 			picPferd.setText("Bild konnte nicht geladen werden.");
 		}
 	}
-	
+	/**
+	 * Gibt das Menue zurück
+	 * @return
+	 */
 	public JMenuBar getJMenuBar() {
 		return menuBar;
 	}
-	
-	//TODO implement
+	/**
+	 * Löscht den Rechnungsteil aus dem GUI
+	 */
 	public void removeRechnung() {
 		remove(neuRechnungPanel);
 	}
-	
+	/**
+	 * Fügt den Rechnungsteil zum GUI hinzu
+	 */
 	public void addRechnung() {
-		
 		add(neuRechnungPanel, "dock east");
+	}
+	/**
+	 * EventHandler. Führt Aktionen aus wenn Buttons
+	 * und Menüpunkte gedrückt werden
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		switch (e.getActionCommand()) {
+		case "SUCHEN":
+			log.info("Starte Suchvorgang...");
+			System.out.println(nameTextField.getText() + "  " + rasseTextField.getText() + "   " + therapieAuswahl.getSelectedIndex());
+			String therapieart = "";
+			String kinderfreundlich = "";
+			switch (therapieAuswahl.getSelectedIndex()) {
+			case 0:
+				therapieart = "";	
+				break;
+			case 1:
+				therapieart = "Hippotherapie";
+				break;
+			case 2:
+				therapieart = "HPV";
+				break;
+			case 3:
+				therapieart = "HPR";
+				break;
+			}
+			switch (kinderAuswahl.getSelectedIndex()) {
+			case 0:
+				kinderfreundlich = "";
+				break;
+			case 1:
+				kinderfreundlich = "TRUE";
+				break;
+			case 2:
+				kinderfreundlich = "FALSE";
+				break;
+			}
+
+			ctm = new CustomTable(updateTable(service.findBy(new SuchPferd(nameTextField.getText(), therapieart,
+					rasseTextField.getText(), Double.parseDouble(preisVonTextField.getText()),
+					Double.parseDouble(preisBisTextField.getText()), kinderfreundlich))), pferdColumnNames);
+		    pferde.setModel(ctm);
+		    ctm.fireTableDataChanged();
+		    ctm.fireTableStructureChanged();
+			
+			break;
+		case "RESET":
+			log.info("Resette Eingabefeld...");
+			preisVonTextField.setText("0");
+			preisBisTextField.setText("0");
+			nameTextField.setText(null);
+			rasseTextField.setText(null);
+			therapieAuswahl.setSelectedIndex(0);
+			kinderAuswahl.setSelectedIndex(0);
+			
+			break;
+		case "NeueRechnung":
+			log.info("Erstelle Rechnungsfeld...");
+			addRechnung();
+			repaint();
+			parent.repaint();
+			parent.pack();
+			break;
+		case "RechnungSpeichern":
+			log.info("Speichere Rechnung ab...");
+			removeRechnung();
+			repaint();
+			parent.repaint();
+			parent.pack();
+			break;
+		default:
+			break;
+		}
+		
 	}
 
 }

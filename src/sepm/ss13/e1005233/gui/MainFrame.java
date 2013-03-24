@@ -11,7 +11,7 @@ public class MainFrame extends JFrame{
         setTitle("Pferdetherapie Manager 2013");
         
         JTabbedPane tabs = new JTabbedPane();
-        PferdPanel pferde = new PferdPanel();
+        PferdPanel pferde = new PferdPanel(this);
         RechnungPanel rechnungen = new RechnungPanel();
         tabs.addTab("Pferdeliste", pferde);
         setJMenuBar(pferde.getJMenuBar());

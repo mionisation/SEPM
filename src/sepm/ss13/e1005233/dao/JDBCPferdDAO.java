@@ -260,6 +260,10 @@ public class JDBCPferdDAO implements PferdDAO {
 		} catch (SQLException e) {
 			throw new JDBCPferdPersistenceException();
 		}
+		log.debug("Liste der Pferde:");
+		for(Pferd p : pferde) {
+			log.info("Pferd Nr. " + p.toString());
+		}
 		return pferde;
 	}
 
