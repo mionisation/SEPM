@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -37,8 +38,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private Service service;
 	private JScrollPane scrollpanepferd, scrollpaneaktiv;
 	private JTable pferde, aktiv;
-	private JButton deleteButton, updatePferdButton, suchButton, addZuRechnungButton, rechnungSpeichernButton, resetButton;
-	private JPanel neuRechnungPanel, suchPanel;
+	private JButton deleteButton, updatePferdButton, suchButton, addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton, addPferdButton;
+	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel;
 	private JLabel picPferd;
 	private JLabel descSearch;
 	private JComboBox<String> therapieAuswahl, kinderAuswahl;
@@ -64,6 +65,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 		menu = new JMenu("Aktionen");
 		menuBar.add(menu);
 		menuItem = new JMenuItem("Neues Pferd...");
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand("NeuesPferdForm");
 		menu.add(menuItem);
 		
 		menuItem = new JMenuItem("Neue Rechnung...");
@@ -74,12 +77,15 @@ public class PferdPanel extends JPanel implements ActionListener{
 		menuItem = new JMenuItem("Hilfe");
 		menu.add(menuItem);
 		menuItem = new JMenuItem("Beenden");
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand("Beenden");
 		menu.add(menuItem);	
 		
 		//erstelle Suchpanel
 		suchPanel = new JPanel(new MigLayout());
 		
-		
+		descSearch = new JLabel("SUCHE:");
+		suchPanel.add(descSearch, " wrap");
 		descSearch = new JLabel("Name:      ");
 		suchPanel.add(descSearch, "split 2");
 		nameTextField = new JTextField(13);
@@ -125,7 +131,9 @@ public class PferdPanel extends JPanel implements ActionListener{
 		//erstelle Pferd-profilbild
 		picPferd = new JLabel("Pferd auswählen um Bild anzuzeigen.");
 		setPferdIcon("C:\\Users\\mion\\Dropbox\\Studium\\4.Semester\\SEPM\\Angabe Einzelbeispiel SS2013\\Beispielfotos\\HeilpaedagogischesVoltigieren(HPV).jpg");
-		suchPanel.add(picPferd, "span, gaptop 50");
+		descSearch = new JLabel("Profilbild:");
+		suchPanel.add(descSearch, "wrap, gaptop 35");
+		suchPanel.add(picPferd, "span");
 		
 		add(suchPanel, "dock west");
 		
@@ -160,6 +168,23 @@ public class PferdPanel extends JPanel implements ActionListener{
 		neuRechnungPanel.add(scrollpaneaktiv);
 		add(neuRechnungPanel, "dock east");
 		removeRechnung();
+		
+		//Erstelle Panel für neue Pferde
+		neuPferdPanel = new JPanel(new MigLayout());
+		
+		addPferdButton = new JButton("Speichern");
+		addPferdButton.addActionListener(this);
+		addPferdButton.setActionCommand("NeuesPferdSpeichern");
+		neuPferdPanel.add(addPferdButton);
+		
+		cancelPferdButton = new JButton("Abbrechen");
+		cancelPferdButton.addActionListener(this);
+		cancelPferdButton.setActionCommand("NeuesPferdAbbrechen");
+		neuPferdPanel.add(cancelPferdButton, "wrap");
+		
+		add(neuPferdPanel, "dock east");
+		//TODO: uncomment and let shit flow
+		//removePferdForm();
 	}
 	
 	public Object[][] updateTable(List<Pferd> pferdeList){
@@ -222,6 +247,74 @@ public class PferdPanel extends JPanel implements ActionListener{
 		add(neuRechnungPanel, "dock east");
 	}
 	/**
+	 * Fügt das Pferdformular zum GUI hinzu
+	 */
+	public void addPferdForm() {
+		add(neuPferdPanel, "dock east");
+	}
+	/**
+	 * Löscht das Pferdformular aus dem GUI
+	 */
+	public void removePferdForm() {
+		remove(neuPferdPanel);
+	}
+	
+	/**
+	 * Aktualisiert den Frame
+	 */
+	public void updateFrame() {
+		repaint();
+		parent.repaint();
+		parent.pack();
+	}
+	
+	/**
+	 * Durchsucht die Datenbank mit den Kriterien, die im Suchfeld angegeben sind.
+	 * Aktualisiert dann die Tabelle mit den gefundenen Ergebnissen
+	 */
+	public void startSuche() {
+		log.info("Starte Suchvorgang...");
+		String therapieart = "";
+		String kinderfreundlich = "";
+		switch (therapieAuswahl.getSelectedIndex()) {
+		case 0:
+			therapieart = "";	
+			break;
+		case 1:
+			therapieart = "Hippotherapie";
+			break;
+		case 2:
+			therapieart = "HPV";
+			break;
+		case 3:
+			therapieart = "HPR";
+			break;
+		}
+		switch (kinderAuswahl.getSelectedIndex()) {
+		case 0:
+			kinderfreundlich = "";
+			break;
+		case 1:
+			kinderfreundlich = "TRUE";
+			break;
+		case 2:
+			kinderfreundlich = "FALSE";
+			break;
+		}
+
+		try {
+			ctm = new CustomTable(updateTable(service.findBy(new SuchPferd(nameTextField.getText(), therapieart,
+					rasseTextField.getText(), Double.parseDouble(preisVonTextField.getText()),
+					Double.parseDouble(preisBisTextField.getText()), kinderfreundlich))), pferdColumnNames);
+		    pferde.setModel(ctm);
+		    ctm.fireTableDataChanged();
+		    ctm.fireTableStructureChanged();
+		} catch (NumberFormatException e2) {
+			JOptionPane.showMessageDialog(this,"Preisangabe muss eine (Dezimal-)Zahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+		}
+		
+	}
+	/**
 	 * EventHandler. Führt Aktionen aus wenn Buttons
 	 * und Menüpunkte gedrückt werden
 	 */
@@ -229,43 +322,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case "SUCHEN":
-			log.info("Starte Suchvorgang...");
-			System.out.println(nameTextField.getText() + "  " + rasseTextField.getText() + "   " + therapieAuswahl.getSelectedIndex());
-			String therapieart = "";
-			String kinderfreundlich = "";
-			switch (therapieAuswahl.getSelectedIndex()) {
-			case 0:
-				therapieart = "";	
-				break;
-			case 1:
-				therapieart = "Hippotherapie";
-				break;
-			case 2:
-				therapieart = "HPV";
-				break;
-			case 3:
-				therapieart = "HPR";
-				break;
-			}
-			switch (kinderAuswahl.getSelectedIndex()) {
-			case 0:
-				kinderfreundlich = "";
-				break;
-			case 1:
-				kinderfreundlich = "TRUE";
-				break;
-			case 2:
-				kinderfreundlich = "FALSE";
-				break;
-			}
-
-			ctm = new CustomTable(updateTable(service.findBy(new SuchPferd(nameTextField.getText(), therapieart,
-					rasseTextField.getText(), Double.parseDouble(preisVonTextField.getText()),
-					Double.parseDouble(preisBisTextField.getText()), kinderfreundlich))), pferdColumnNames);
-		    pferde.setModel(ctm);
-		    ctm.fireTableDataChanged();
-		    ctm.fireTableStructureChanged();
-			
+			startSuche();
 			break;
 		case "RESET":
 			log.info("Resette Eingabefeld...");
@@ -275,21 +332,38 @@ public class PferdPanel extends JPanel implements ActionListener{
 			rasseTextField.setText(null);
 			therapieAuswahl.setSelectedIndex(0);
 			kinderAuswahl.setSelectedIndex(0);
-			
+			startSuche();
 			break;
 		case "NeueRechnung":
 			log.info("Erstelle Rechnungsfeld...");
+			//TODO andere lsösung?
+			removePferdForm();
 			addRechnung();
-			repaint();
-			parent.repaint();
-			parent.pack();
+			updateFrame();
 			break;
 		case "RechnungSpeichern":
 			log.info("Speichere Rechnung ab...");
 			removeRechnung();
-			repaint();
-			parent.repaint();
-			parent.pack();
+			updateFrame();
+			break;
+		case "Beenden":
+			System.exit(0);
+			break;
+		case "NeuesPferdForm":
+			log.info("Bereite Form für neues Pferd vor...");
+			//TODO andere lösung?
+			removeRechnung();
+			addPferdForm();
+			updateFrame();
+			break;
+		case "NeuesPferdAbbrechen":
+			log.info("Breche Vorgang zur Erstellung des neuen Pferds ab, lösche Pferdformular...");
+			removePferdForm();
+			updateFrame();
+			break;
+		case "NeuesPferdSpeichern":
+			log.info("Speichere neu angelegtes Pferd ab...");
+
 			break;
 		default:
 			break;
