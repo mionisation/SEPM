@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -41,13 +42,14 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private JButton deleteButton, updatePferdButton, suchButton, addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton, addPferdButton;
 	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel;
 	private JLabel picPferd;
-	private JLabel descSearch;
+	private JLabel descSearch, descInsert;
 	private JComboBox<String> therapieAuswahl, kinderAuswahl;
 	private JMenuBar menuBar;
 	private JMenu menu;
 	private JFrame parent;
 	private CustomTable ctm;
-	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField;
+	private JFileChooser picChooser = new JFileChooser();
+	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField, nameForm, rasseForm, preisForm, bildForm;
 	private JMenuItem menuItem;
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
@@ -80,7 +82,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		menuItem.addActionListener(this);
 		menuItem.setActionCommand("Beenden");
 		menu.add(menuItem);	
-		
+
 		//erstelle Suchpanel
 		suchPanel = new JPanel(new MigLayout());
 		
@@ -130,7 +132,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 		//erstelle Pferd-profilbild
 		picPferd = new JLabel("Pferd auswählen um Bild anzuzeigen.");
-		setPferdIcon("C:\\Users\\mion\\Dropbox\\Studium\\4.Semester\\SEPM\\Angabe Einzelbeispiel SS2013\\Beispielfotos\\HeilpaedagogischesVoltigieren(HPV).jpg");
+		setPferdIcon("Profilbilder/6.jpg");
 		descSearch = new JLabel("Profilbild:");
 		suchPanel.add(descSearch, "wrap, gaptop 35");
 		suchPanel.add(picPferd, "span");
@@ -172,10 +174,18 @@ public class PferdPanel extends JPanel implements ActionListener{
 		//Erstelle Panel für neue Pferde
 		neuPferdPanel = new JPanel(new MigLayout());
 		
+		descInsert = new JLabel("Neues Pferd hinzufügen:");
+		neuPferdPanel.add(descInsert, "wrap");
+		
+		descInsert = new JLabel("Name:");
+		neuPferdPanel.add(descInsert, "split 2");
+		nameForm = new JTextField(13);
+		neuPferdPanel.add(nameForm, "wrap");
+		
 		addPferdButton = new JButton("Speichern");
 		addPferdButton.addActionListener(this);
 		addPferdButton.setActionCommand("NeuesPferdSpeichern");
-		neuPferdPanel.add(addPferdButton);
+		neuPferdPanel.add(addPferdButton, "split 2");
 		
 		cancelPferdButton = new JButton("Abbrechen");
 		cancelPferdButton.addActionListener(this);
@@ -184,7 +194,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 		add(neuPferdPanel, "dock east");
 		//TODO: uncomment and let shit flow
-		//removePferdForm();
+//		removePferdForm();
 	}
 	
 	public Object[][] updateTable(List<Pferd> pferdeList){
