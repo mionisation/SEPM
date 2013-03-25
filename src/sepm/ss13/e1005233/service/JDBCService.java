@@ -40,20 +40,15 @@ public class JDBCService implements Service {
 	}
 	
 	@Override
-	public void insertPferd(Pferd p) throws PferdValidationException {
+	public void insertPferd(Pferd p) throws PferdValidationException, PferdPersistenceException {
 		log.info("Bereite Service zum Einfügen vor...");
 		if(!isValid(p)) {
 			log.error("Pferde Daten inkorrekt!");
 			throw new PferdValidationException();
 		}
 		
-		try {
-			pferdDao.insertPferd(p);
-			log.debug("Service zum Einfügen erfolgreich beendet!");				
-		} catch (PferdPersistenceException e) {
-			log.error("Persistenz Error während Einfügeservice!");
-			e.printStackTrace();
-		}
+		pferdDao.insertPferd(p);
+		log.debug("Service zum Einfügen erfolgreich beendet!");	
 
 	}
 
@@ -177,6 +172,18 @@ public class JDBCService implements Service {
 	public List<Rechnung> findAllRechnungen() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getNewId() {
+		int id = -1;
+		try {
+			id = pferdDao.getNewId();
+		} catch (PferdPersistenceException e) {
+			log.error("Konnte keine ID generieren!");
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 }

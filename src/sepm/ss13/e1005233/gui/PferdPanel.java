@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.print.attribute.standard.PresentationDirection;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -23,12 +25,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.SuchPferd;
+import sepm.ss13.e1005233.exceptions.JDBCPferdPersistenceException;
+import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
+import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.service.JDBCService;
 import sepm.ss13.e1005233.service.Service;
 
@@ -41,28 +49,40 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private JTable pferde, aktiv;
 	private JButton deleteButton, updatePferdButton, suchButton,
 	addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton,
-	addPferdButton, rechnungAbbrechenButton;
+	addPferdButton, rechnungAbbrechenButton, picButton;
 	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel;
-	private JLabel picPferd;
-	private JLabel descSearch, descInsert;
-	private JComboBox<String> therapieAuswahl, kinderAuswahl;
+	private JLabel picPferd, pferdLabel;
+	private JLabel descSearch, descInsert, picLabel;
+	private JComboBox<String> therapieAuswahl, kinderAuswahl, therapieForm;
 	private JMenuBar menuBar;
 	private JMenu menu;
+	private String selectedPic;
+	private JCheckBox insertKinder;
 	private JFrame parent;
 	private CustomTable ctm;
-	private JFileChooser picChooser = new JFileChooser();
+	private JFileChooser picChooser;
+	private ListSelectionListener lsl= new ListSelectionListener() {
+	      public void valueChanged(ListSelectionEvent e) {
+	           setPferdIcon(service.getPferd(new Pferd((int) pferde.getValueAt(pferde.getSelectedRow(), 0))).getFoto());
+	      }
+	    };
 	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField, nameForm, rasseForm, preisForm, bildForm;
 	private JMenuItem menuItem;
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
+	private final String[] insertTherapieArten = {"Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Kinderfreundlich"};
 	private final String[] aktivColumnNames = {"ID#", "Name", "Preis", "Stunden"};
+	private ListSelectionModel ldm;
 	private static final Logger log = Logger.getLogger(PferdPanel.class);
 	public PferdPanel(JFrame parent) {
 		super(new MigLayout());
 		log.debug("Erstelle neues PferdPanel...");
 		
 		service = new JDBCService();
+		picChooser = new JFileChooser();
+		selectedPic = "";
+		picChooser.setFileFilter(new BildFilter());
 		this.parent = parent;
 		//erstelle Menu
 		menuBar = new JMenuBar();
@@ -141,16 +161,26 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 		add(suchPanel, "dock west");
 		
-		//Erstelle Buttons für Pferdfunktionalitäten		
+		//Erstelle Buttons für Pferdfunktionalitäten
+		pferdLabel = new JLabel("Ausgewähltes Pferd: ");
+		add(pferdLabel, "split 3, gapleft 5");
+		
 		updatePferdButton = new JButton("Bearbeiten");
-		add(updatePferdButton, "split 2, gapleft 5, gaptop 7");
+		updatePferdButton.setActionCommand("PferdBearbeiten");
+		updatePferdButton.addActionListener(this);
+		add(updatePferdButton, "gapleft 5, gaptop 7");
 		
 		deleteButton = new JButton("Löschen");
+		deleteButton.setActionCommand("PferdLöschen");
+		deleteButton.addActionListener(this);
 		add(deleteButton, "wrap, gaptop 5");
 				
 		//Erstelle Pferdetabelle, uneditierbar
 		ctm = new CustomTable(updateTable(service.findAllUndeletedPferde()), pferdColumnNames);
 		pferde = new JTable(ctm);
+		ldm = pferde.getSelectionModel();
+		ldm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		ldm.addListSelectionListener(lsl);
 		scrollpanepferd = new JScrollPane(pferde);
 		add(scrollpanepferd);
 		
@@ -184,10 +214,36 @@ public class PferdPanel extends JPanel implements ActionListener{
 		descInsert = new JLabel("Neues Pferd hinzufügen:");
 		neuPferdPanel.add(descInsert, "wrap");
 		
-		descInsert = new JLabel("Name:");
+		descInsert = new JLabel("Name:  ");
 		neuPferdPanel.add(descInsert, "split 2");
 		nameForm = new JTextField(13);
-		neuPferdPanel.add(nameForm, "wrap");
+		neuPferdPanel.add(nameForm, "wrap");		
+		
+		descInsert = new JLabel("Rasse: ");
+		neuPferdPanel.add(descInsert, "split 2");
+		rasseForm = new JTextField(13);
+		neuPferdPanel.add(rasseForm, "wrap");
+		
+		descInsert = new JLabel("Stundenpreis:  ");
+		neuPferdPanel.add(descInsert, "split 2");
+		preisForm = new JTextField(9);
+		neuPferdPanel.add(preisForm, "wrap");
+		
+		descInsert = new JLabel("Therapieart:");
+		neuPferdPanel.add(descInsert, "wrap");
+		therapieForm = new JComboBox<String>(insertTherapieArten);
+		neuPferdPanel.add(therapieForm, "wrap");
+		therapieForm.setSelectedIndex(-1);
+		
+		picButton = new JButton("Wähle Profilbild");
+		picButton.addActionListener(this);
+		picButton.setActionCommand("PicAuswahl");
+		neuPferdPanel.add(picButton, "wrap");
+		picLabel = new JLabel("Kein Bild ausgewählt.");
+		neuPferdPanel.add(picLabel, "wrap");
+		
+		insertKinder = new JCheckBox("Kinderfreundlich");
+		neuPferdPanel.add(insertKinder, "wrap");
 		
 		addPferdButton = new JButton("Speichern");
 		addPferdButton.addActionListener(this);
@@ -200,8 +256,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		neuPferdPanel.add(cancelPferdButton, "wrap");
 		
 		add(neuPferdPanel, "dock east");
-		//TODO: uncomment and let shit flow
-//		removePferdForm();
+		removePferdForm();
 	}
 	
 	public Object[][] updateTable(List<Pferd> pferdeList){
@@ -237,6 +292,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 			myPicture = ImageIO.read(new File(path));
 			log.debug("Image size is " + myPicture.getWidth() + " x " + myPicture.getHeight());
 			im = myPicture.getScaledInstance(200, (int) (200 * ((double)myPicture.getHeight()/myPicture.getWidth())), Image.SCALE_SMOOTH);
+			if(myPicture.getHeight() > myPicture.getWidth())
+				im = im.getScaledInstance((int) (170 * ((double)myPicture.getWidth()/myPicture.getHeight())), 170, Image.SCALE_SMOOTH);
 			log.info("Bild vom Pferd geladen!");
 			picPferd.setIcon(new ImageIcon(im));
 		} catch (IOException e) {
@@ -331,6 +388,17 @@ public class PferdPanel extends JPanel implements ActionListener{
 		}
 		
 	}
+	
+	/**
+	 * Setzt das Formular zum Einfügen neuer Pferde zurück
+	 */
+	public void resetInsertPferdForm() {
+		nameForm.setText("");
+		rasseForm.setText("");
+		preisForm.setText("");
+		insertKinder.setSelected(false);
+		therapieForm.setSelectedIndex(-1);
+	}
 	/**
 	 * EventHandler. Führt Aktionen aus wenn Buttons
 	 * und Menüpunkte gedrückt werden
@@ -353,7 +421,6 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		case "NeueRechnung":
 			log.info("Erstelle Rechnungsfeld...");
-			//TODO andere lsösung?
 			removePferdForm();
 			addRechnung();
 			updateFrame();
@@ -373,19 +440,80 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		case "NeuesPferdForm":
 			log.info("Bereite Form für neues Pferd vor...");
-			//TODO andere lösung?
 			removeRechnung();
 			addPferdForm();
 			updateFrame();
 			break;
 		case "NeuesPferdAbbrechen":
 			log.info("Breche Vorgang zur Erstellung des neuen Pferds ab, lösche Pferdformular...");
+			resetInsertPferdForm();
 			removePferdForm();
 			updateFrame();
 			break;
 		case "NeuesPferdSpeichern":
 			log.info("Speichere neu angelegtes Pferd ab...");
-
+			
+			String therapieart = "";
+			switch (therapieForm.getSelectedIndex()) {
+			case -1:
+				JOptionPane.showMessageDialog(this,"Gebe eine Therapieart an.", "Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			case 0:
+				therapieart = "Hippotherapie";
+				break;
+			case 1:
+				therapieart = "HPV";
+				break;
+			case 2:
+				therapieart = "HPR";
+				break;
+			}
+			if(selectedPic.isEmpty() || selectedPic == null) {
+				JOptionPane.showMessageDialog(this,"Bitte gebe ein Bild an.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			try {
+			Pferd p = new Pferd(service.getNewId(), nameForm.getText(), selectedPic, Double.parseDouble(preisForm.getText()),
+					therapieart, rasseForm.getText(), insertKinder.isSelected(), false);
+			service.insertPferd(p);
+			} catch (NumberFormatException e3) {
+				JOptionPane.showMessageDialog(this,"Preisangabe muss eine (Dezimal-)Zahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch (PferdValidationException e4) {
+				JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch(PferdPersistenceException e5) {
+				JOptionPane.showMessageDialog(this,"Eingabe ist zu lang!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			}
+						
+			resetInsertPferdForm();
+			removePferdForm();
+			startSuche();
+			updateFrame();
+			break;
+		case "PferdLöschen":
+			//TODO vielleicht "wollen sies wirklich löschen"-dialog
+			if(pferde.getSelectedRow() < 0 || pferde.getSelectedColumn() < 0) {
+				JOptionPane.showMessageDialog(this,"Wähle eine Zeile aus.","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			service.deletePferd(new Pferd((int)pferde.getValueAt(pferde.getSelectedRow(), 0)));
+			startSuche();
+			updateFrame();
+			break;
+		case "PferdBearbeiten":
+			if(pferde.getSelectedRow() < 0 || pferde.getSelectedColumn() < 0) {
+				JOptionPane.showMessageDialog(this,"Wähle eine Zeile aus.","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			break;
+		case "PicAuswahl":
+			int val = picChooser.showOpenDialog(this);
+			if (val == JFileChooser.APPROVE_OPTION) {
+				selectedPic = picChooser.getSelectedFile().getAbsolutePath();
+				picLabel.setText("Profilbild ausgewählt.");
+			}
 			break;
 		default:
 			break;

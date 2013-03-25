@@ -5,6 +5,7 @@ import java.util.List;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
+import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.exceptions.RechnungValidationException;
 import sepm.ss13.e1005233.exceptions.SearchValidationException;
@@ -19,8 +20,9 @@ public interface Service {
 	 * Diese Methode erstellt ein neues Pferd
 	 * @param p das neue Pferd
 	 * @throws PferdValidationException wird bei unzulässigen Werten geworfen
+	 * @throws PferdPersistenceException 
 	 */
-	public void insertPferd(Pferd p) throws PferdValidationException;
+	public void insertPferd(Pferd p) throws PferdValidationException, PferdPersistenceException;
 	
 	/**
 	 * Diese Methode erstellt eine neue Rechnung
@@ -92,4 +94,10 @@ public interface Service {
 	 * @return eine Liste aller gespeicherten Rechnungen
 	 */
 	public List<Rechnung> findAllRechnungen();
+	
+	/**
+	 * Diese Methode gibt die ID des nächsten Pferdes zurück
+	 * @return eine zulässige ID für ein neues Pferd
+	 */
+	public int getNewId();
 }
