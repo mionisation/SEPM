@@ -39,7 +39,9 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private Service service;
 	private JScrollPane scrollpanepferd, scrollpaneaktiv;
 	private JTable pferde, aktiv;
-	private JButton deleteButton, updatePferdButton, suchButton, addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton, addPferdButton;
+	private JButton deleteButton, updatePferdButton, suchButton,
+	addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton,
+	addPferdButton, rechnungAbbrechenButton;
 	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel;
 	private JLabel picPferd;
 	private JLabel descSearch, descInsert;
@@ -157,12 +159,17 @@ public class PferdPanel extends JPanel implements ActionListener{
 		neuRechnungPanel = new JPanel(new MigLayout());
 		
 		addZuRechnungButton = new JButton("Hinzufügen");
-		neuRechnungPanel.add(addZuRechnungButton, "split 2");
+		neuRechnungPanel.add(addZuRechnungButton, "split 3");
 		
 		rechnungSpeichernButton = new JButton("Rechnung speichern");
 		rechnungSpeichernButton.addActionListener(this);
 		rechnungSpeichernButton.setActionCommand("RechnungSpeichern");
-		neuRechnungPanel.add(rechnungSpeichernButton, "wrap");
+		neuRechnungPanel.add(rechnungSpeichernButton);
+		
+		rechnungAbbrechenButton = new JButton("Abbrechen");
+		rechnungAbbrechenButton.addActionListener(this);
+		rechnungAbbrechenButton.setActionCommand("RechnungAbbrechen");
+		neuRechnungPanel.add(rechnungAbbrechenButton, "wrap");
 		
 		Object[][] temp = {};
 		aktiv = new JTable(new CustomTable(temp, aktivColumnNames));
@@ -353,6 +360,11 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		case "RechnungSpeichern":
 			log.info("Speichere Rechnung ab...");
+			removeRechnung();
+			updateFrame();
+			break;
+		case "RechnungAbbrechen":
+			log.info("Breche Anlegen neuer Rechnung ab...");
 			removeRechnung();
 			updateFrame();
 			break;
