@@ -91,20 +91,15 @@ public class JDBCService implements Service {
 	}
 
 	@Override
-	public void updatePferd(Pferd p) throws PferdValidationException {
+	public void updatePferd(Pferd p) throws PferdValidationException, PferdPersistenceException {
 		log.info("Bereite Service zum Aktualisieren vor...");
 		if(!isValid(p)) {
 			log.error("Pferde Daten inkorrekt!");
 			throw new PferdValidationException();
 		}
 		
-		try {
-			pferdDao.updatePferd(p);
-			log.debug("Service zum Aktualisieren erfolgreich beendet!");				
-		} catch (PferdPersistenceException e) {
-			log.error("Persistenz Error während Aktualisierungsservice!");
-			e.printStackTrace();
-		}
+		pferdDao.updatePferd(p);
+		log.debug("Service zum Aktualisieren erfolgreich beendet!");				
 	}
 
 	@Override

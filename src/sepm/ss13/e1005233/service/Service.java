@@ -48,8 +48,9 @@ public interface Service {
 	/**
 	 * Diese Methode aktualisiert ein Pferd
 	 * @param p das Pferd das aktualisiert werden soll
+	 * @throws PferdPersistenceException wird bei zu langer Eingabe geworfen
 	 */
-	public void updatePferd(Pferd p) throws PferdValidationException;
+	public void updatePferd(Pferd p) throws PferdValidationException, PferdPersistenceException;
 	
 	/**
 	 * Diese Methode löscht ein Pferd

@@ -1,11 +1,13 @@
 package sepm.ss13.e1005233.gui;
 
+import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -49,31 +51,38 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private JTable pferde, aktiv;
 	private JButton deleteButton, updatePferdButton, suchButton,
 	addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton,
-	addPferdButton, rechnungAbbrechenButton, picButton;
-	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel;
-	private JLabel picPferd, pferdLabel;
-	private JLabel descSearch, descInsert, picLabel;
-	private JComboBox<String> therapieAuswahl, kinderAuswahl, therapieForm;
+	addPferdButton, rechnungAbbrechenButton, picButton, editPicButton, editPferdButton;
+	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel, editPferdPanel;
+	private JLabel picPferd, pferdLabel, editPicLabel, descSearch, descInsert, picLabel, editInsert;
+	private JComboBox<String> therapieAuswahl, kinderAuswahl, therapieForm, editTherapieForm;
 	private JMenuBar menuBar;
 	private JMenu menu;
+	private Pferd p;
 	private String selectedPic;
-	private JCheckBox insertKinder;
+	private JCheckBox insertKinder, editInsertKinder;
 	private JFrame parent;
 	private CustomTable ctm;
 	private JFileChooser picChooser;
 	private ListSelectionListener lsl= new ListSelectionListener() {
 	      public void valueChanged(ListSelectionEvent e) {
-	           setPferdIcon(service.getPferd(new Pferd((int) pferde.getValueAt(pferde.getSelectedRow(), 0))).getFoto());
+	    	  if(pferde.getSelectedRow()<0 || pferde.getSelectedColumn() < 0) {
+	    		  return;
+	    	  }
+	    	  setPferdIcon(service.getPferd(new Pferd((int) pferde.getValueAt(pferde.getSelectedRow(), 0))).getFoto());
 	      }
 	    };
-	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField, nameForm, rasseForm, preisForm, bildForm;
+	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField, nameForm,
+	 editNameForm, editPreisForm, editRasseForm, rasseForm, preisForm, bildForm;
 	private JMenuItem menuItem;
+	private String therapieart;
+	private final String[] loeschen = {"Ja", "Nein"};
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] insertTherapieArten = {"Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Kinderfreundlich"};
 	private final String[] aktivColumnNames = {"ID#", "Name", "Preis", "Stunden"};
 	private ListSelectionModel ldm;
+	private int editPferdId;
 	private static final Logger log = Logger.getLogger(PferdPanel.class);
 	public PferdPanel(JFrame parent) {
 		super(new MigLayout());
@@ -154,7 +163,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 		//erstelle Pferd-profilbild
 		picPferd = new JLabel("Pferd auswählen um Bild anzuzeigen.");
-		setPferdIcon("Profilbilder/6.jpg");
+		setPferdIcon("Profilbilder/logo.jpg");
 		descSearch = new JLabel("Profilbild:");
 		suchPanel.add(descSearch, "wrap, gaptop 35");
 		suchPanel.add(picPferd, "span");
@@ -257,6 +266,63 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 		add(neuPferdPanel, "dock east");
 		removePferdForm();
+		
+		
+		//erstelle Panel zum Bearbeiten von Pferden
+		editPferdPanel = new JPanel(new MigLayout());
+		
+		editInsert = new JLabel("Pferd bearbeiten:");
+		editPferdPanel.add(editInsert, "wrap");
+		
+		editInsert = new JLabel("Name:  ");
+		editPferdPanel.add(editInsert, "split 2");
+		editNameForm = new JTextField(13);
+		editPferdPanel.add(editNameForm, "wrap");		
+		
+		editInsert = new JLabel("Rasse: ");
+		editPferdPanel.add(editInsert, "split 2");
+		editRasseForm = new JTextField(13);
+		editPferdPanel.add(editRasseForm, "wrap");
+		
+		editInsert = new JLabel("Stundenpreis:  ");
+		editPferdPanel.add(editInsert, "split 2");
+		editPreisForm = new JTextField(9);
+		editPferdPanel.add(editPreisForm, "wrap");
+		
+		editInsert = new JLabel("Therapieart:");
+		editPferdPanel.add(editInsert, "wrap");
+		editTherapieForm = new JComboBox<String>(insertTherapieArten);
+		editPferdPanel.add(editTherapieForm, "wrap");
+		editTherapieForm.setSelectedIndex(-1);
+		
+		editPicButton = new JButton("Wähle Profilbild");
+		editPicButton.addActionListener(this);
+		editPicButton.setActionCommand("PicAuswahl");
+		editPferdPanel.add(editPicButton, "wrap");
+		editPicLabel = new JLabel("Kein Bild ausgewählt.");
+		editPferdPanel.add(editPicLabel, "wrap");
+		
+		editInsertKinder = new JCheckBox("Kinderfreundlich");
+		editPferdPanel.add(editInsertKinder, "wrap");
+		
+		editPferdButton = new JButton("Speichern");
+		editPferdButton.addActionListener(this);
+		editPferdButton.setActionCommand("PferdBearbeitenSpeichern");
+		editPferdPanel.add(editPferdButton, "split 2");
+		
+		cancelPferdButton = new JButton("Abbrechen");
+		cancelPferdButton.addActionListener(this);
+		cancelPferdButton.setActionCommand("PferdBearbeitenAbbrechen");
+		editPferdPanel.add(cancelPferdButton, "wrap");
+		
+		add(editPferdPanel, "dock east");
+		removeEditPferd();
+		
+		
+		
+		
+		
+		
 	}
 	
 	public Object[][] updateTable(List<Pferd> pferdeList){
@@ -332,6 +398,18 @@ public class PferdPanel extends JPanel implements ActionListener{
 	public void removePferdForm() {
 		remove(neuPferdPanel);
 	}
+	/**
+	 * Fügt das Bearbeitenformular zum GUI hinzu
+	 */
+	public void addEditPferd() {
+		add(editPferdPanel, "dock east");
+	}
+	/**
+	 * Löscht das Bearbeitenformular aus dem GUI
+	 */
+	public void removeEditPferd() {
+		remove(editPferdPanel);
+	}
 	
 	/**
 	 * Aktualisiert den Frame
@@ -388,6 +466,13 @@ public class PferdPanel extends JPanel implements ActionListener{
 		}
 		
 	}
+	/**
+	 * Gibt das in der Tabelle ausgewählte Pferd zurück
+	 * @return das ausgewählte Pferd
+	 */
+	public Pferd getSelectedPferd() {
+		return new Pferd((int)pferde.getValueAt(pferde.getSelectedRow(), 0));
+	}
 	
 	/**
 	 * Setzt das Formular zum Einfügen neuer Pferde zurück
@@ -422,6 +507,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		case "NeueRechnung":
 			log.info("Erstelle Rechnungsfeld...");
 			removePferdForm();
+			removeEditPferd();
 			addRechnung();
 			updateFrame();
 			break;
@@ -441,6 +527,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		case "NeuesPferdForm":
 			log.info("Bereite Form für neues Pferd vor...");
 			removeRechnung();
+			removeEditPferd();
 			addPferdForm();
 			updateFrame();
 			break;
@@ -453,7 +540,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		case "NeuesPferdSpeichern":
 			log.info("Speichere neu angelegtes Pferd ab...");
 			
-			String therapieart = "";
+			therapieart = "";
 			switch (therapieForm.getSelectedIndex()) {
 			case -1:
 				JOptionPane.showMessageDialog(this,"Gebe eine Therapieart an.", "Eingabefehler", JOptionPane.ERROR_MESSAGE);
@@ -473,7 +560,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 				return;
 			}
 			try {
-			Pferd p = new Pferd(service.getNewId(), nameForm.getText(), selectedPic, Double.parseDouble(preisForm.getText()),
+			p = new Pferd(service.getNewId(), nameForm.getText(), selectedPic, Double.parseDouble(preisForm.getText()),
 					therapieart, rasseForm.getText(), insertKinder.isSelected(), false);
 			service.insertPferd(p);
 			} catch (NumberFormatException e3) {
@@ -498,7 +585,12 @@ public class PferdPanel extends JPanel implements ActionListener{
 				JOptionPane.showMessageDialog(this,"Wähle eine Zeile aus.","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			service.deletePferd(new Pferd((int)pferde.getValueAt(pferde.getSelectedRow(), 0)));
+			int dec = JOptionPane.showOptionDialog(parent, "Wollen sie das Pferd wirklich löschen?",
+					"Pferd löschen", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
+					null, loeschen, loeschen[0]);
+			if(dec == 1)
+				return;
+			service.deletePferd(getSelectedPferd());
 			startSuche();
 			updateFrame();
 			break;
@@ -507,6 +599,30 @@ public class PferdPanel extends JPanel implements ActionListener{
 				JOptionPane.showMessageDialog(this,"Wähle eine Zeile aus.","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			removeRechnung();
+			removePferdForm();
+			addEditPferd();
+			updateFrame();
+			Pferd p = service.getPferd(getSelectedPferd());
+			editPferdId = p.getId();
+			editNameForm.setText(p.getName());
+			editPreisForm.setText(Double.toString(p.getPreis()));
+			editRasseForm.setText(p.getRasse());
+			editInsertKinder.setSelected(p.isKinderfreundlich());
+			picChooser.setSelectedFile(new File(p.getFoto()));
+			selectedPic = p.getFoto();
+			editPicLabel.setText(BildFilter.getFileName(p.getFoto()));
+			switch (p.getTherapieart()) {
+			case "Hippotherapie":
+				editTherapieForm.setSelectedIndex(0);
+				break;
+			case "HPV":
+				editTherapieForm.setSelectedIndex(1);
+				break;
+			case  "HPR":
+				editTherapieForm.setSelectedIndex(2);
+				break;
+			}
 			break;
 		case "PicAuswahl":
 			int val = picChooser.showOpenDialog(this);
@@ -514,6 +630,50 @@ public class PferdPanel extends JPanel implements ActionListener{
 				selectedPic = picChooser.getSelectedFile().getAbsolutePath();
 				picLabel.setText("Profilbild ausgewählt.");
 			}
+			break;
+		case "PferdBearbeitenAbbrechen":
+			log.info("Breche Vorgang zur Bearbeitung ab...");
+			removeEditPferd();
+			updateFrame();
+			break;
+		case "PferdBearbeitenSpeichern":
+			log.info("Speichere bearbeitetes Pferd ab...");
+			therapieart = "";
+			switch (editTherapieForm.getSelectedIndex()) {
+			case -1:
+				JOptionPane.showMessageDialog(this,"Gebe eine Therapieart an.", "Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			case 0:
+				therapieart = "Hippotherapie";
+				break;
+			case 1:
+				therapieart = "HPV";
+				break;
+			case 2:
+				therapieart = "HPR";
+				break;
+			}
+			if(selectedPic.isEmpty() || selectedPic == null) {
+				JOptionPane.showMessageDialog(this,"Bitte gebe ein Bild an.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			try {
+			p = new Pferd(editPferdId, editNameForm.getText(), selectedPic, Double.parseDouble(editPreisForm.getText()),
+					therapieart, editRasseForm.getText(), editInsertKinder.isSelected(), false);
+			service.updatePferd(p);
+			} catch (NumberFormatException e3) {
+				JOptionPane.showMessageDialog(this,"Preisangabe muss eine (Dezimal-)Zahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch (PferdValidationException e4) {
+				JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch(PferdPersistenceException e5) {
+				JOptionPane.showMessageDialog(this,"Eingabe ist zu lang!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			}
+			removeEditPferd();
+			startSuche();
+			updateFrame();
 			break;
 		default:
 			break;

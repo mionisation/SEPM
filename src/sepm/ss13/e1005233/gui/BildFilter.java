@@ -33,9 +33,15 @@ public class BildFilter extends FileFilter {
         return dateiname.substring(dateiname.lastIndexOf('.')+1).toLowerCase();
     }
 
+    public static String getFileName(String p) {
+    	int last = Math.max(p.lastIndexOf("/"), p.lastIndexOf("\\"));
+    	return p.substring(last + 1);
+    }
+    
 	@Override
 	public String getDescription() {
 		return "Bilder";
 	}
+	
 
 }
