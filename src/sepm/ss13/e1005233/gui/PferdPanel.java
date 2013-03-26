@@ -378,36 +378,42 @@ public class PferdPanel extends JPanel implements ActionListener{
 	 * Löscht den Rechnungsteil aus dem GUI
 	 */
 	public void removeRechnung() {
+		log.info("Lösche Rechnungdialog...");
 		remove(neuRechnungPanel);
 	}
 	/**
 	 * Fügt den Rechnungsteil zum GUI hinzu
 	 */
 	public void addRechnung() {
+		log.info("Füge Rechnungdialog hinzu...");
 		add(neuRechnungPanel, "dock east");
 	}
 	/**
 	 * Fügt das Pferdformular zum GUI hinzu
 	 */
 	public void addPferdForm() {
+		log.info("Füge Pferdformular hinzu...");
 		add(neuPferdPanel, "dock east");
 	}
 	/**
 	 * Löscht das Pferdformular aus dem GUI
 	 */
 	public void removePferdForm() {
+		log.info("Lösche Pferdformular...");
 		remove(neuPferdPanel);
 	}
 	/**
 	 * Fügt das Bearbeitenformular zum GUI hinzu
 	 */
 	public void addEditPferd() {
+		log.info("Füge Pferdformular zur Bearbeitung hinzu...");
 		add(editPferdPanel, "dock east");
 	}
 	/**
 	 * Löscht das Bearbeitenformular aus dem GUI
 	 */
 	public void removeEditPferd() {
+		log.info("Lösche Formular zur Bearbeitung...");
 		remove(editPferdPanel);
 	}
 	
@@ -415,6 +421,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	 * Aktualisiert den Frame
 	 */
 	public void updateFrame() {
+		log.info("Aktualisiere Frame...");
 		repaint();
 		parent.repaint();
 		parent.pack();
@@ -471,13 +478,16 @@ public class PferdPanel extends JPanel implements ActionListener{
 	 * @return das ausgewählte Pferd
 	 */
 	public Pferd getSelectedPferd() {
-		return new Pferd((int)pferde.getValueAt(pferde.getSelectedRow(), 0));
+		int id =(int)pferde.getValueAt(pferde.getSelectedRow(), 0);
+		log.info("Gebe ausgewähltes Pferd zurück mit der ID: " + id);
+		return new Pferd(id);
 	}
 	
 	/**
 	 * Setzt das Formular zum Einfügen neuer Pferde zurück
 	 */
 	public void resetInsertPferdForm() {
+		log.debug("Setze Pferdformular zurück...");
 		nameForm.setText("");
 		rasseForm.setText("");
 		preisForm.setText("");
@@ -522,6 +532,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			updateFrame();
 			break;
 		case "Beenden":
+			log.debug("Beende Programm...");
 			System.exit(0);
 			break;
 		case "NeuesPferdForm":
@@ -580,7 +591,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			updateFrame();
 			break;
 		case "PferdLöschen":
-			//TODO vielleicht "wollen sies wirklich löschen"-dialog
+			log.info("Lösche ausgewähltes Pferd...");
 			if(pferde.getSelectedRow() < 0 || pferde.getSelectedColumn() < 0) {
 				JOptionPane.showMessageDialog(this,"Wähle eine Zeile aus.","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -595,6 +606,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			updateFrame();
 			break;
 		case "PferdBearbeiten":
+			log.info("Bearbeite ausgewähltes Pferd...");
 			if(pferde.getSelectedRow() < 0 || pferde.getSelectedColumn() < 0) {
 				JOptionPane.showMessageDialog(this,"Wähle eine Zeile aus.","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -625,6 +637,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			}
 			break;
 		case "PicAuswahl":
+			log.info("Wähle Bild aus...");
 			int val = picChooser.showOpenDialog(this);
 			if (val == JFileChooser.APPROVE_OPTION) {
 				selectedPic = picChooser.getSelectedFile().getAbsolutePath();
