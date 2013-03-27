@@ -458,6 +458,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		    ctm.fireTableDataChanged();
 		    ctm.fireTableStructureChanged();
 		} catch (NumberFormatException e2) {
+			log.debug("Eingabe ist zu lang!");
 			JOptionPane.showMessageDialog(this,"Preisangabe muss eine (Dezimal-)Zahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 		}
 		
@@ -566,12 +567,15 @@ public class PferdPanel extends JPanel implements ActionListener{
 					therapieart, rasseForm.getText(), insertKinder.isSelected(), false);
 			service.insertPferd(p);
 			} catch (NumberFormatException e3) {
+				log.debug("Eingabe ist keine Dezimalzahl!");
 				JOptionPane.showMessageDialog(this,"Preisangabe muss eine (Dezimal-)Zahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			} catch (PferdValidationException e4) {
+				log.debug("Eingabe darf nicht leer sein!");
 				JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			} catch(PferdPersistenceException e5) {
+				log.debug("Eingabe ist zu lang!");
 				JOptionPane.showMessageDialog(this,"Eingabe ist zu lang!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			}
@@ -667,12 +671,15 @@ public class PferdPanel extends JPanel implements ActionListener{
 					therapieart, editRasseForm.getText(), editInsertKinder.isSelected(), false);
 			service.updatePferd(p);
 			} catch (NumberFormatException e3) {
+				log.debug("Eingabe ist keine Dezimalzahl!");
 				JOptionPane.showMessageDialog(this,"Preisangabe muss eine (Dezimal-)Zahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			} catch (PferdValidationException e4) {
+				log.debug("Eingabe darf nicht leer sein!");
 				JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			} catch(PferdPersistenceException e5) {
+				log.debug("Eingabe ist zu lang!");
 				JOptionPane.showMessageDialog(this,"Eingabe ist zu lang!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			}

@@ -3,6 +3,7 @@ package sepm.ss13.e1005233.test;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public abstract class RechnungDAOTest {
 	
 	public RechnungDAOTest() {
 		this.rechnungDao = null;
+		buchungen = new ArrayList<Buchung>();
 	}
 	
 	/**
@@ -66,7 +68,7 @@ public abstract class RechnungDAOTest {
 	public void insertValidEntity() throws RechnungPersistenceException {
 		log.debug("Führe insertValidEntity-Test aus..." );
 		buchungen.clear();
-		testRechnung = new Rechnung(new Timestamp(1364310163L), "Fredi Frederikson", "Kreditkarte",  200.12, 13, 232342333332L,
+		testRechnung = new Rechnung(new Timestamp(1364310163L), "Fredi Frederikson", "Barzahlung",  200.12, 13, 232342333332L,
 				buchungen);
 		buchungen.add(new Buchung(new Pferd(1), testRechnung, 2, 3.3));
 		buchungen.add(new Buchung(new Pferd(2), testRechnung, 2, 3.3));
@@ -115,7 +117,7 @@ public abstract class RechnungDAOTest {
 	@Test(expected = RechnungPersistenceException.class)
 	public void retrieveInvalidEntity() throws RechnungPersistenceException {
 		log.debug("Führe retrieveInvalidEntity-Test aus...");
-		testRechnung = new Rechnung(new Timestamp(1364310252L), "Fredi Frederikson", "Kreditkarte",  200.12, 13, 232342333332L,
+		testRechnung = new Rechnung(new Timestamp(1364310252L), "Fredi Frederikson", "Kreditkarte",  200.12, 13, 1234589L,
 				buchungen);
 		//nach der Rechnung wird gesucht
 		rechnungDao.getRechnung(testRechnung);

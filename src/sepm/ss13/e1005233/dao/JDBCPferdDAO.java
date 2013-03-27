@@ -57,6 +57,7 @@ public class JDBCPferdDAO implements PferdDAO {
 		pst.executeUpdate();
 		pst.close();
 		} catch(SQLException e) {
+			log.debug("Fehler während des Einfügens aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 		log.info("Einfügen abgeschlossen.");
@@ -79,6 +80,7 @@ public class JDBCPferdDAO implements PferdDAO {
 				result.getString("therapieart"), result.getString("rasse"),
 				result.getBoolean("kinderfreundlich"), result.getBoolean("deleted"));
 		} catch(SQLException e) {
+			log.debug("Fehler während der Rückgabe aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 	}
@@ -103,6 +105,7 @@ public class JDBCPferdDAO implements PferdDAO {
 		pst.executeUpdate();
 		pst.close();
 		} catch(SQLException e) {
+			log.debug("Fehler während des Aktualisierens aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 		
@@ -122,6 +125,7 @@ public class JDBCPferdDAO implements PferdDAO {
 		pst.executeUpdate();
 		pst.close();
 		} catch(SQLException e) {
+			log.debug("Fehler während des Löschens aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 		log.info("Löschen abgeschlossen.");
@@ -140,6 +144,7 @@ public class JDBCPferdDAO implements PferdDAO {
 		log.debug("Gebe neue ID zurück mit Wert " + id);
 		return id;
 		} catch (SQLException e) {
+			log.debug("Fehler während der ID Rückgabe aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 	}
@@ -153,6 +158,7 @@ public class JDBCPferdDAO implements PferdDAO {
 		log.debug("Gebe Liste aller gespeicherten Pferde zurück...");
 		return genPferdList(result);
 		} catch(SQLException e) {
+			log.debug("Fehler während der Rückgabe aller Pferde aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 	}
@@ -165,11 +171,10 @@ public class JDBCPferdDAO implements PferdDAO {
 		log.debug("Gebe Liste aller gespeicherten und nicht gelöschten Pferde zurück...");
 		return genPferdList(result);
 		} catch(SQLException e) {
+			log.debug("Fehler während der Rückgabe aller ungelöschten Pferde aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 	}
-	
-	
 	/**
 	 * Gibt die Verbindung zur HSQLDB zurück
 	 * @return die Connection zur Datenbank
@@ -186,10 +191,10 @@ public class JDBCPferdDAO implements PferdDAO {
 		log.debug("Gebe Liste der den Suchkriterien entsprechenden Pferde zurück...");
 		return genPferdList(result);
 		} catch(SQLException e) {
+			log.debug("Fehler während des Suchens aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 	}
-
 	/**
 	 * Diese Methode generiert ein passendes SQL-Statement aus einem
 	 * angegebenen Suchpferd
@@ -248,6 +253,12 @@ public class JDBCPferdDAO implements PferdDAO {
 		return statement;
 	}
 
+	/**
+	 * Generiert aus einem ResultSet eine Liste von Pferden
+	 * @param set das ResultSet, das Pferd-daten beinhaltet
+	 * @return eine Liste aus Pferden des Resultsets
+	 * @throws JDBCPferdPersistenceException geworfen falls ein Fehler beim Datenzugriff entsteht
+	 */
 	public List<Pferd> genPferdList(ResultSet set) throws JDBCPferdPersistenceException {
 		ArrayList<Pferd> pferde = new ArrayList<Pferd>();
 		try {
@@ -258,6 +269,7 @@ public class JDBCPferdDAO implements PferdDAO {
 						set.getBoolean("kinderfreundlich"), set.getBoolean("deleted")));
 			}
 		} catch (SQLException e) {
+			log.debug("Fehler während der Erstellung der Pferdeliste aufgetreten!");
 			throw new JDBCPferdPersistenceException();
 		}
 		log.debug("Liste der Pferde:");

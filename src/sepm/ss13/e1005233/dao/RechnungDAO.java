@@ -4,6 +4,7 @@ package sepm.ss13.e1005233.dao;
 import java.util.List;
 
 import sepm.ss13.e1005233.domain.Rechnung;
+import sepm.ss13.e1005233.exceptions.JDBCRechnungPersistenceException;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
 
 /**
@@ -28,6 +29,7 @@ public interface RechnungDAO {
 	/**
 	 * Findet alle gespeicherten Rechnungen
 	 * @return eine Liste aller gespeicherten Rechnungen
+	 * @throws JDBCRechnungPersistenceException 
 	 */
-	public List<Rechnung> findAll();
+	public List<Rechnung> findAll() throws JDBCRechnungPersistenceException;
 }
