@@ -5,8 +5,10 @@ import java.util.List;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
+import sepm.ss13.e1005233.exceptions.BuchungValidationException;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
+import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
 import sepm.ss13.e1005233.exceptions.RechnungValidationException;
 import sepm.ss13.e1005233.exceptions.SearchValidationException;
 
@@ -28,8 +30,10 @@ public interface Service {
 	 * Diese Methode erstellt eine neue Rechnung
 	 * @param r die neue Rechnung
 	 * @throws RechnungValidationException wird bei unzulässigen Werten geworfen
+	 * @throws RechnungPersistenceException wird bei Fehlern während DAO-Prozessen geworfen
+	 * @throws BuchungValidationException wird bei unzulässigen Werten geworfen
 	 */
-	public void createRechnung(Rechnung r) throws RechnungValidationException;
+	public void insertRechnung(Rechnung r) throws RechnungValidationException, RechnungPersistenceException, BuchungValidationException;
 	
 	/**
 	 * Diese Methode gibt das gesuchte Pferd zurück

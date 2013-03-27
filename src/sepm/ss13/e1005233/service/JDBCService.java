@@ -1,6 +1,8 @@
 package sepm.ss13.e1005233.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -39,6 +41,29 @@ public class JDBCService implements Service {
 				p.getTherapieart().equals("HPV") || p.getTherapieart().equals("Hippotherapie")));
 	}
 	
+	/**
+	 * Überprüft, ob es sich um eine gültige Rechnung handelt
+	 * @param r die auf Gültigkeit zu prüfende Rechnung
+	 * @return gibt true zurück wenn die Rechnung gültig ist, sonst false
+	 */
+	public boolean isValid(Rechnung r) {
+		return (r.getGesamtpreis() > 0 && r.getGesamtstunden() > 0 &&
+				r.getName() != null && !r.getName().isEmpty() &&
+				r.getTelefon() >= 1000 && r.getTelefon() < 9223372036854775806L &&
+				(r.getZahlungsart().equals("Barzahlung") || r.getZahlungsart().equals("Kreditkarte") ||
+						r.getZahlungsart().equals("Ueberweisung")));
+	}
+	
+	
+	/**
+	 * Überprüft, ob es sich um eine gültige Buchung handelt
+	 * @param b die auf Gültigkeit zu prüfende Buchung
+	 * @return gibt true zurück wenn die Buchung gültig ist, sonst false
+	 */
+	public boolean isValid(Buchung b) {
+		return b.getStunden() > 0 && b.getPreis() > 0;
+	}
+	
 	@Override
 	public void insertPferd(Pferd p) throws PferdValidationException, PferdPersistenceException {
 		log.info("Bereite Service zum Einfügen vor...");
@@ -48,13 +73,25 @@ public class JDBCService implements Service {
 		}
 		
 		pferdDao.insertPferd(p);
-		log.debug("Service zum Einfügen erfolgreich beendet!");	
+		log.debug("Service zum Einfügen neuer Pferde erfolgreich beendet!");	
 
 	}
 
 	@Override
-	public void createRechnung(Rechnung r) throws RechnungValidationException {
-		// TODO Auto-generated method stub
+	public void insertRechnung(Rechnung r) throws RechnungValidationException, RechnungPersistenceException, BuchungValidationException {
+		if(!isValid(r)) {
+			log.error("Rechnungsdaten inkorrekt!");
+			throw new RechnungValidationException();
+		}
+		for(Buchung b : r.getBuchungen()) {
+			if(!isValid(b)) {
+				log.error("Buchungsdaten inkorrekt!");
+				throw new BuchungValidationException();
+			}
+		}
+		
+		rechnungDao.insertRechnung(r);
+		log.debug("Service zum Einfügen neuer Rechnungen erfolgreich beendet!");
 
 	}
 
@@ -144,26 +181,77 @@ public class JDBCService implements Service {
 
 	@Override
 	public List<Pferd> getPopularPferde() {
-		// TODO Auto-generated method stub
-		return null;
+		log.info("Beginne Suche nach den 3 meistgebuchten Pferden...");
+		//alle Pferde die durchgegangen werden müssen
+		List<Pferd> all = findAllPferde();
+		int countPferde = all.size();
+		//ein Hilfsarray um die Pferde nach gebuchten Stunden sortieren zu können
+		PferdVergleich[] sumPferde = new PferdVergleich[countPferde];
+		int stundenCounter;
+		int pferdIndex = 0;
+		for(Pferd p : all) {
+			stundenCounter = 0;
+			try {
+				List<Buchung> buchungen = rechnungDao.getBuchungen(p);
+				//Die gebuchten Stunden in jedem Pferd werden zusammengezählt
+				for(Buchung b : buchungen) {
+					stundenCounter += b.getStunden();
+				}
+				sumPferde[pferdIndex] = new PferdVergleich(p.getId(), stundenCounter);
+			} catch (RechnungPersistenceException e) {
+				log.error("Fehler während der Rückgabe aller Buchungen!");
+				e.printStackTrace();
+			}
+			++pferdIndex;
+		}
+		//die Pferde werden aufsteigend nach Stunden sortiert
+		Arrays.sort(sumPferde);
+		all.clear();
+		all.add(getPferd(new Pferd(sumPferde[countPferde-1].id)));
+		all.add(getPferd(new Pferd(sumPferde[countPferde-2].id)));
+		all.add(getPferd(new Pferd(sumPferde[countPferde-3].id)));
+		log.info("Suche nach den 3 beliebtesten Pferden abgeschlossen!");
+		return all;
 	}
 
 	@Override
 	public void verteurePferde(List<Pferd> lp) {
-		// TODO Auto-generated method stub
+		for(Pferd p : lp) {
+			double preis = p.getPreis()*1.05;
+			p.setPreis(preis);
+			try {
+				pferdDao.updatePferd(p);
+			} catch (PferdPersistenceException e) {
+				log.error("Fehler während der Verteurung der Pferde!");
+				e.printStackTrace();
+			}
+		}
 
 	}
 
 	@Override
 	public Rechnung getRechnung(Rechnung r) {
-		// TODO Auto-generated method stub
+		log.info("Beginne Service zur Rückgabe der Rechnung");
+		try {
+			return rechnungDao.getRechnung(r);
+		} catch (RechnungPersistenceException e) {
+			log.error("Fehler während der Rechnungsrückgabe!");
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	@Override
 	public List<Rechnung> findAllRechnungen() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Rechnung> rl = null;
+		try {
+			rl = rechnungDao.findAll();
+			log.debug("Service zur Rückgabe aller Rechnungen erfolgreich beendet!");
+		} catch (RechnungPersistenceException e) {
+			log.error("Persistenz Error während Service zur Rückgabe aller Rechnungen!");
+			e.printStackTrace();
+		}
+		return rl;
 	}
 
 	@Override
@@ -177,5 +265,28 @@ public class JDBCService implements Service {
 		}
 		return id;
 	}
+	
+	/**
+	 * Eine Hilfsklasse, die die id und die gesamten gebuchten Stunden
+	 * eines Pferds abspeichert
+	 */
+	private class PferdVergleich implements Comparable<PferdVergleich> {
+		private int id;
+		private int stunden;
+		
+		public PferdVergleich(int id, int stunden) {
+			this.id = id;
+			this.stunden = stunden;
+		}
 
+		@Override
+		public int compareTo(PferdVergleich pv) {
+			if(this.stunden < pv.stunden)
+				return -1;
+			else if(this.stunden > pv.stunden)
+				return 1;
+			else
+				return 0;
+		}
+	}
 }

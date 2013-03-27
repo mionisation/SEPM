@@ -3,6 +3,8 @@ package sepm.ss13.e1005233.dao;
 
 import java.util.List;
 
+import sepm.ss13.e1005233.domain.Buchung;
+import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.exceptions.JDBCRechnungPersistenceException;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
@@ -31,5 +33,13 @@ public interface RechnungDAO {
 	 * @return eine Liste aller gespeicherten Rechnungen
 	 * @throws JDBCRechnungPersistenceException 
 	 */
-	public List<Rechnung> findAll() throws JDBCRechnungPersistenceException;
+	public List<Rechnung> findAll() throws RechnungPersistenceException;
+	
+	/**
+	 * Gibt eine Liste der Buchungen, die einem Pferd zugeordnet sind, zurück
+	 * @param p das Pferd, dessen Buchungen zurückgegeben werden sollen
+	 * @return die Liste der zugeordneten Buchungen
+	 * @throws JDBCRechnungPersistenceException wenn etwas während der Rückgabe fehlgeschlagen ist
+	 */
+	public List<Buchung> getBuchungen(Pferd p) throws RechnungPersistenceException;
 }

@@ -114,6 +114,20 @@ public class JDBCRechnungDAO implements RechnungDAO {
 		return genBuchungList(buchungQ);
 	}
 	
+	@Override
+	public List<Buchung> getBuchungen(Pferd p) throws JDBCRechnungPersistenceException {
+		ResultSet buchungQ = null;
+		try {
+			st = c.createStatement();
+			buchungQ = st.executeQuery("SELECT * FROM BUCHUNG WHERE ID ='" + p.getId() + "'");
+		} catch (SQLException e) {
+			log.debug("Fehler während Buchungen-rückgabe aufgetreten!");
+			e.printStackTrace();
+			throw new JDBCRechnungPersistenceException();
+		}
+		return genBuchungList(buchungQ);
+	}
+	
 	/**
 	 * Generiert aus einem ResultSet, das Buchungen enthält, eine Liste von Buchungen
 	 * @param set ein ResultSet mit Buchungen
