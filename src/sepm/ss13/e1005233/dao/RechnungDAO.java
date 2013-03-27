@@ -1,6 +1,8 @@
 package sepm.ss13.e1005233.dao;
 
 
+import java.util.List;
+
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
 
@@ -24,16 +26,8 @@ public interface RechnungDAO {
 	public Rechnung getRechnung (Rechnung r) throws RechnungPersistenceException;
 	
 	/**
-	 * Gibt eine Rechnung r an, welche die durch date spezifizierte Rechnung
-	 * ersetzt
-	 * @param date die zu ersetzende Rechnung
-	 * @param r die neue (aktualisierte) Rechnung
+	 * Findet alle gespeicherten Rechnungen
+	 * @return eine Liste aller gespeicherten Rechnungen
 	 */
-	public void updateRechnung (Rechnung r) throws RechnungPersistenceException;
-	
-	/**
-	 * Löscht die spezifizierte Rechnung
-	 * @param date das Datum der zu löschenden Rechnung
-	 */
-	public void deleteRechnung (Rechnung r) throws RechnungPersistenceException;
+	public List<Rechnung> findAll();
 }

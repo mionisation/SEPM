@@ -11,15 +11,32 @@ public class Rechnung {
 	private Timestamp date;
 	private String name, zahlungsart;
 	private double gesamtpreis;
-	private int gesamtstunden, telefon;
+	private int gesamtstunden;
+	private long telefon;
 	private List<Buchung> buchungen;
 	
 	public Rechnung(Timestamp date) {
 		this.date = date;
+		this.name = null;
+		this.zahlungsart = null;
+		this.gesamtpreis = 0;
+		this.gesamtstunden = 0;
+		this.telefon = 0;
+		this.buchungen = null;
+	}	
+	
+	public Rechnung(Timestamp date, String name, String zahlungsart,
+			double gesamtpreis, int gesamtstunden, long telefon,
+			List<Buchung> buchungen) {
+		this.date = date;
+		this.name = name;
+		this.zahlungsart = zahlungsart;
+		this.gesamtpreis = gesamtpreis;
+		this.gesamtstunden = gesamtstunden;
+		this.telefon = telefon;
+		this.buchungen = buchungen;
 	}
-	
-	
-	
+
 	//Getter und Setter zu den Informationen
 
 	public Timestamp getDate() {
@@ -52,7 +69,7 @@ public class Rechnung {
 	public void setGesamtstunden(int gesamtstunden) {
 		this.gesamtstunden = gesamtstunden;
 	}
-	public int getTelefon() {
+	public long getTelefon() {
 		return telefon;
 	}
 	public void setTelefon(int telefon) {

@@ -42,5 +42,5 @@ public class JDBCPferdDAOTest extends PferdDAOTest {
 		log.debug(this.getClass().getSimpleName() +" erfolgreich zurückgesetzt!");
 
 	}
-
+	
 }

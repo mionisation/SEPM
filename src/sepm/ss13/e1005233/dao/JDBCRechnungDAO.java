@@ -42,18 +42,6 @@ public class JDBCRechnungDAO implements RechnungDAO {
 		log.debug("Gebe Rechnung zurück mit Datum " + r.getDate().toString());
 		return null;
 	}
-
-	@Override
-	public void updateRechnung(Rechnung r) {
-		log.debug("Aktualisiere Rechnung mit Datum " + r.getDate().toString());
-		
-	}
-
-	@Override
-	public void deleteRechnung(Rechnung r) {
-		log.debug("Lösche Rechnung mit Datum " + r.getDate().toString());
-		
-	}
 	
 	//TODO implement
 	public List<Buchung> getBuchungen(Rechnung r) {
@@ -71,6 +59,12 @@ public class JDBCRechnungDAO implements RechnungDAO {
 	 */
 	public Connection getConnection() {
 		return c;
+	}
+
+	@Override
+	public List<Rechnung> findAll() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

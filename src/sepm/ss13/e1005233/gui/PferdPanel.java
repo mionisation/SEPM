@@ -1,17 +1,14 @@
 package sepm.ss13.e1005233.gui;
 
-import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.print.attribute.standard.PresentationDirection;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -30,13 +27,10 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-
 import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.SuchPferd;
-import sepm.ss13.e1005233.exceptions.JDBCPferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.service.JDBCService;
@@ -64,7 +58,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private CustomTable ctm;
 	private JFileChooser picChooser;
 	private ListSelectionListener lsl= new ListSelectionListener() {
-	      public void valueChanged(ListSelectionEvent e) {
+	      @Override
+		public void valueChanged(ListSelectionEvent e) {
 	    	  if(pferde.getSelectedRow()<0 || pferde.getSelectedColumn() < 0) {
 	    		  return;
 	    	  }
@@ -72,7 +67,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	      }
 	    };
 	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField, nameForm,
-	 editNameForm, editPreisForm, editRasseForm, rasseForm, preisForm, bildForm;
+	 editNameForm, editPreisForm, editRasseForm, rasseForm, preisForm;
 	private JMenuItem menuItem;
 	private String therapieart;
 	private final String[] loeschen = {"Ja", "Nein"};
@@ -317,12 +312,6 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 		add(editPferdPanel, "dock east");
 		removeEditPferd();
-		
-		
-		
-		
-		
-		
 	}
 	
 	public Object[][] updateTable(List<Pferd> pferdeList){
@@ -510,6 +499,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			preisBisTextField.setText("0");
 			nameTextField.setText(null);
 			rasseTextField.setText(null);
+			setPferdIcon("Profilbilder/logo.jpg");
 			therapieAuswahl.setSelectedIndex(0);
 			kinderAuswahl.setSelectedIndex(0);
 			startSuche();
@@ -540,6 +530,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			removeRechnung();
 			removeEditPferd();
 			addPferdForm();
+			picChooser.setSelectedFile(new File(""));
 			updateFrame();
 			break;
 		case "NeuesPferdAbbrechen":
@@ -599,7 +590,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 			int dec = JOptionPane.showOptionDialog(parent, "Wollen sie das Pferd wirklich löschen?",
 					"Pferd löschen", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
 					null, loeschen, loeschen[0]);
-			if(dec == 1)
+			log.debug("Entscheidung ist: " + dec);
+			if(dec != 0)
 				return;
 			service.deletePferd(getSelectedPferd());
 			startSuche();

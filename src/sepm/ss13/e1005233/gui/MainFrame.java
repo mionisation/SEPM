@@ -1,7 +1,6 @@
 package sepm.ss13.e1005233.gui;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
 public class MainFrame extends JFrame{

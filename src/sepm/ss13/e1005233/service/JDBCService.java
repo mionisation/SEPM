@@ -67,7 +67,6 @@ public class JDBCService implements Service {
 			log.error("Persistenz Error während Rückgabeservice!");
 			e.printStackTrace();
 		}
-		//TODO find better solution for exception handling
 		return null;
 	}
 	
@@ -126,7 +125,6 @@ public class JDBCService implements Service {
 			log.error("Persistenz Error während Service zur Rückgabe aller Pferde!");
 			e.printStackTrace();
 		}
-		// TODO schänere Lösung? 
 		return tl;
 	}
 	
@@ -140,7 +138,6 @@ public class JDBCService implements Service {
 			log.error("Persistenz Error während Service zur Rückgabe aller nicht gelöschten Pferde!");
 			e.printStackTrace();
 		}
-		// TODO schänere Lösung? 
 		return tl;
 	}
 	

@@ -12,6 +12,12 @@ public class Buchung {
 	
 	//Getter und Setter zu den Informationen
 
+	public Buchung(Pferd pferd, Rechnung rechnung, int stunden, double preis) {
+		this.pferd = pferd;
+		this.rechnung = rechnung;
+		this.stunden = stunden;
+		this.preis = preis;
+	}
 	public Pferd getPferd() {
 		return pferd;
 	}

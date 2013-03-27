@@ -114,6 +114,22 @@ public abstract class PferdDAOTest {
 	}
 	
 	/**
+	 * Dieser Test versucht ein nicht verfügbares Pferd zurückzugeben.
+	 * Es muss eine Exception geworfen werden
+	 * @throws PferdPersistenceException muss geworfen werden, da
+	 * falscher Programmablauf
+	 */
+	@Test(expected = PferdPersistenceException.class)
+	public void retrieveInvalidEntity() throws PferdPersistenceException {
+		log.debug("Führe retrieveInvalidEntity-Test aus..." );
+		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		//nach dem Pferd wird gesucht
+		testpferd2 = pferdDao.getPferd(testpferd);
+
+	}
+	
+	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank
 	 * und aktualisiert sie mit neuen Werten
 	 * @throws PferdPersistenceException 
@@ -141,6 +157,27 @@ public abstract class PferdDAOTest {
 	}
 	
 	/**
+	 * Dieser Test speichert eine valide Entität in die Datenbank
+	 * und aktualisiert sie mit unzulässigen Werten, es wird eine PferdPersistenceException
+	 * geworfen
+	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt,
+	 * muss geworfen werden
+	 */
+	@Test(expected = PferdPersistenceException.class)
+	public void insertAndUpdateInvalidEntity() throws PferdPersistenceException {
+		log.debug("Führe insertAndUpdateValidEntity-Test aus..." );
+		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);
+		//das Pferd wird mit ungültigen Werten aktualisiert
+		testpferd.setTherapieart("BlahBlah");
+		testpferd.setName(null);
+		pferdDao.updatePferd(testpferd);
+	}
+
+	
+	/**
 	 * Dieser Test speichert eine valide Entität in die Datenbank und
 	 * löscht sie wieder heraus
 	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt
@@ -159,7 +196,93 @@ public abstract class PferdDAOTest {
 		assertThat( pferde.contains(testpferd), is(false));
 	}
 	
-	//TODO find by tests
+	/**
+	 * Dieser Test speichert zwei valide Entität in die Datenbank und
+	 * löscht sie wieder heraus, versucht aber auch eine Entität zu löschen,
+	 * die nicht abgespeichert ist. Dadurch soll aber kein Fehler in der
+	 * Datenstruktur entstehen
+	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt
+	 */
+	@Test
+	public void insertAndDeleteValidEntityAndDeleteNotAvailableEntity() throws PferdPersistenceException  {
+		log.debug("Führe insertAndDeleteValidEntityAndDeleteNotAvailableEntity-Test aus..." );
+		//Erstelle und füge Pferde ein
+		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		insertPferdAndCheck(testpferd);
+		testpferd2 = new Pferd(pferdDao.getNewId(), "Dolly", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		insertPferdAndCheck(testpferd2);
+		testpferd3 = new Pferd(pferdDao.getNewId(), "Albert", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		//Pferde werden gelöscht
+		pferdDao.deletePferd(testpferd);
+		pferdDao.deletePferd(testpferd2);
+		pferdDao.deletePferd(testpferd3);
+		//dürfen nicht mehr enthalten sein
+		pferde = pferdDao.findAll();
+		assertThat( pferde.contains(testpferd2), is(false));
+		assertThat( pferde.contains(testpferd3), is(false));
+		assertThat( pferde.contains(testpferd), is(false));
+
+	}
+	
+	/**
+	 * Dieser Test speichert ein paar valide Entitäten ein.
+	 * Dann wird eine Liste mit allen abgespeicherten Pferden
+	 * zurückgegeben, die alle zuvor eingefügten Pferde enthalten muss.
+	 * @throws PferdPersistenceException  wenn ein Fehler während des Tests auftritt
+	 */
+	@Test
+	public void findAllEntities() throws PferdPersistenceException {
+		log.debug("Führe findAllEntities-Test aus..." );
+		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);
+		testpferd2 = new Pferd(pferdDao.getNewId(), "Albert", "/bild.jpg",
+				9.5, "HPR", "", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd2);	
+		testpferd3 = new Pferd(pferdDao.getNewId(), "Fred", "/bild.jpg",
+				4, "Hippotherapie", "Schimmel", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd3);	
+		pferde = pferdDao.findAll();
+		assertThat(pferde.contains(testpferd), is(true));
+		assertThat(pferde.contains(testpferd2), is(true));
+		assertThat(pferde.contains(testpferd3), is(true));
+
+	}
+	
+	/**
+	 * Dieser Test speichert ein paar valide Entitäten ein.
+	 * Dann wird eine Liste mit allen abgespeicherten und nicht gelöschten Pferden
+	 * zurückgegeben, die alle zuvor eingefügten und nicht als gelöscht markierten Pferde enthalten muss.
+	 * @throws PferdPersistenceException  wenn ein Fehler während des Tests auftritt
+	 */
+	@Test
+	public void findAllUndeletedEntities() throws PferdPersistenceException {
+		log.debug("Führe findAllUndeletedEntities-Test aus..." );
+		testpferd = new Pferd(pferdDao.getNewId(), "Marie", "/bild.jpg",
+				10.2, "HPR", "Haflinger", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd);
+		testpferd2 = new Pferd(pferdDao.getNewId(), "Albert", "/bild.jpg",
+				9.5, "HPR", "", true, true);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd2);	
+		testpferd3 = new Pferd(pferdDao.getNewId(), "Fred", "/bild.jpg",
+				4, "Hippotherapie", "Schimmel", true, false);
+		//füge Pferd ein
+		insertPferdAndCheck(testpferd3);	
+		pferde = pferdDao.findAllUndeleted();
+		assertThat(pferde.contains(testpferd), is(true));
+		assertThat(pferde.contains(testpferd2), is(false));
+		assertThat(pferde.contains(testpferd3), is(true));
+
+	}
+	
 	/**
 	 * Dieser Test speichert ein paar Entitäten in die Datenbank und
 	 * versucht sie über eine Suchanfrage über Name, Rasse und Kinderfreundlichkeit herauszubekommen
@@ -185,6 +308,37 @@ public abstract class PferdDAOTest {
 		//Pferde müssen enthalten sein
 		assertThat(pferde.contains(testpferd), is(true));
 		assertThat(pferde.contains(testpferd2), is(true));
+		assertThat(pferde.contains(testpferd3), is(false));
+
+		
+	}
+	/**
+	 * Dieser Test speichert ein paar Entitäten in die Datenbank und
+	 * versucht sie über eine Suchanfrage über Preis und Therapieart herauszubekommen
+	 * @throws PferdPersistenceException wenn ein Fehler während des Tests auftritt
+	 */
+	@Test
+	public void insertAndRetrieveByPriceTherapy() throws PferdPersistenceException {
+		log.debug("Führe insertAndRetrieveByPriceTherapy-Test aus...");
+		//erstelle Pferde und füge sie ein
+		testpferd = new Pferd(pferdDao.getNewId(), "Dodel", "/bild1.jpg",
+				4, "HPR", "Schimmel", true, false);
+		insertPferdAndCheck(testpferd);
+		testpferd2 = new Pferd(pferdDao.getNewId(), "Dodel2", "/bild2.jpg",
+				7, "HPR", "Schimmel", true, false);
+		insertPferdAndCheck(testpferd2);
+		testpferd3 = new Pferd(pferdDao.getNewId(), "Dodel3", "/bild3.jpg",
+				10, "HPV", "Schimmel", false, false);
+		insertPferdAndCheck(testpferd3);
+
+		//erstelle neues Suchpferd und suche mit jenem nach Pferden
+		SuchPferd sp = new SuchPferd(null, "HPR", null, 6, 11, "");
+		pferde = pferdDao.findBy(sp);
+		//Pferde müssen enthalten sein
+		assertThat(pferde.contains(testpferd), is(false));
+		assertThat(pferde.contains(testpferd2), is(true));
+		assertThat(pferde.contains(testpferd3), is(false));
+
 		
 	}
 }
