@@ -72,7 +72,6 @@ public abstract class RechnungDAOTest {
 				buchungen);
 		buchungen.add(new Buchung(new Pferd(1), testRechnung, 2, 3.3));
 		buchungen.add(new Buchung(new Pferd(2), testRechnung, 2, 3.3));
-		
 		//füge Rechnung ein
 		insertRechnungAndCheck(testRechnung);	
 	}

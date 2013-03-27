@@ -42,4 +42,16 @@ public class Buchung {
 	public void setPreis(double preis) {
 		this.preis = preis;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		Buchung b;
+		if(obj instanceof Buchung)
+			b = (Buchung) obj;
+		else
+			return false;
+		return (this.pferd.getId() == b.getPferd().getId()) &&
+				(this.preis == b.getPreis()) && (this.stunden == b.getStunden()) &&
+				(this.rechnung.getDate().equals(b.getRechnung().getDate()));
+	}
 }

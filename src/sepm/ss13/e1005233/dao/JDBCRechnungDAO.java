@@ -42,8 +42,6 @@ public class JDBCRechnungDAO implements RechnungDAO {
 	public void insertRechnung(Rechnung r) throws JDBCRechnungPersistenceException {
 		log.info("Beginne Einfügevorgang...");
 		log.debug("Füge Rechnung ein mit Datum " + r.getDate().toString());
-		
-		
 		try {
 			pst = c.prepareStatement("INSERT INTO Rechnungen (datum, name, gesamtpreis, "
 					+"gesamtstunden, zahlungsart, telefon) VALUES (?,?,?,?,?,?)");
@@ -73,25 +71,69 @@ public class JDBCRechnungDAO implements RechnungDAO {
 			throw new JDBCRechnungPersistenceException();
 		}
 		log.info("Einfügen abgeschlossen!");
-	
-		
-		
 	}
 
 	@Override
-	public Rechnung getRechnung(Rechnung r) {
+	public Rechnung getRechnung(Rechnung r) throws JDBCRechnungPersistenceException {
+		log.info("Beginne Rückgabevorgang...");
 		log.debug("Gebe Rechnung zurück mit Datum " + r.getDate().toString());
-		return null;
+		try {
+			pst = c.prepareStatement("SELECT * FROM Rechnungen WHERE DATUM = ?");
+			pst.setTimestamp(1, r.getDate());
+			result = pst.executeQuery();
+			pst.close();
+			result.next();
+			log.info("Rückgabe abgeschlossen.");
+			
+			return new Rechnung(result.getTimestamp("datum"), result.getString("name"), 
+					result.getString("zahlungsart"), result.getDouble("gesamtpreis"),
+					result.getInt("gesamtstunden"), result.getLong("telefon"),
+					getBuchungen(new Rechnung(result.getTimestamp("datum"))));
+		} catch(SQLException e) {
+			log.debug("Fehler während der Rückgabe aufgetreten!");
+			throw new JDBCRechnungPersistenceException();
+		}
 	}
 	
-	//TODO implement
-	public List<Buchung> getBuchungen(Rechnung r) {
-		return null;
+	/**
+	 * Gibt eine Liste der Buchungen, die einer Rechnung zugeordnet sind, zurück
+	 * @param r die Rechnung, deren Buchungen zurückgegeben werden sollen
+	 * @return die Liste der zugeordneten Buchungen
+	 * @throws JDBCRechnungPersistenceException wenn etwas während der Rückgabe fehlgeschlagen ist
+	 */
+	public List<Buchung> getBuchungen(Rechnung r) throws JDBCRechnungPersistenceException {
+		ResultSet buchungQ = null;
+		try {
+			st = c.createStatement();
+			buchungQ = st.executeQuery("SELECT * FROM BUCHUNG WHERE DATUM ='" + r.getDate() + "'");
+		} catch (SQLException e) {
+			log.debug("Fehler während Buchungen-rückgabe aufgetreten!");
+			e.printStackTrace();
+			throw new JDBCRechnungPersistenceException();
+		}
+		return genBuchungList(buchungQ);
 	}
 	
-	//TODO implement
-	public List<Buchung> genBuchungList(ResultSet set) {
-		return null;
+	/**
+	 * Generiert aus einem ResultSet, das Buchungen enthält, eine Liste von Buchungen
+	 * @param set ein ResultSet mit Buchungen
+	 * @return eine Liste von Buchungen
+	 * @throws JDBCRechnungPersistenceException wenn die Attributsrückgabe fehlgeschlagen ist
+	 */
+	public List<Buchung> genBuchungList(ResultSet set) throws JDBCRechnungPersistenceException {
+		ArrayList<Buchung> buchungen = new ArrayList<Buchung>();
+		log.debug("Liste der Buchungen:  ");
+		try {
+			while(set.next()) {
+				log.info("Buchungsdatum:  " + set.getTimestamp("datum"));
+				buchungen.add(new Buchung(new Pferd(set.getInt("id")), new Rechnung(set.getTimestamp("datum")),
+						set.getInt("stunden"), set.getDouble("preis")));
+			}
+		} catch (SQLException e) {
+			log.debug("Fehler während der Erstellung der Buchungsliste aufgetreten!");
+			throw new JDBCRechnungPersistenceException();
+		}
+		return buchungen;
 	}
 	
 	/**
@@ -120,12 +162,14 @@ public class JDBCRechnungDAO implements RechnungDAO {
 	 * eine Liste aus Rechnungen
 	 * @param set ein ResultSet aus Rechnungen
 	 * @return eine Liste der Rechnungen
-	 * @throws JDBCRechnungPersistenceException 
+	 * @throws JDBCRechnungPersistenceException wenn die Attributsrückgabe fehlgeschlagen ist
 	 */
 	public List<Rechnung> genRechnungList(ResultSet set) throws JDBCRechnungPersistenceException {
 		ArrayList<Rechnung> rechnungen = new ArrayList<Rechnung>();
+		log.debug("Liste der Rechnungen:");
 		try {
 			while(set.next()) {
+				log.info("Rechnung Datum:  " + set.getTimestamp("datum"));
 				rechnungen.add(new Rechnung(set.getTimestamp("datum"), set.getString("name"),
 						set.getString("zahlungsart"), set.getDouble("gesamtpreis"),
 						set.getInt("gesamtstunden"), set.getLong("telefon"),
@@ -135,13 +179,6 @@ public class JDBCRechnungDAO implements RechnungDAO {
 			log.debug("Fehler während der Erstellung der Rechnungsliste aufgetreten!");
 			throw new JDBCRechnungPersistenceException();
 		}
-		log.debug("Liste der Rechnungen:");
-		for(Rechnung r: rechnungen) {
-			log.info("Rechnung Datum:  " + r.toString());
-		}
 		return rechnungen;
-		
 	}
-
-
 }

@@ -261,8 +261,10 @@ public class JDBCPferdDAO implements PferdDAO {
 	 */
 	public List<Pferd> genPferdList(ResultSet set) throws JDBCPferdPersistenceException {
 		ArrayList<Pferd> pferde = new ArrayList<Pferd>();
+		log.debug("Liste der Pferde:  ");
 		try {
 			while(set.next()) {
+				log.info("Pferd Nr. " + set.getInt("id"));
 				pferde.add(new Pferd(set.getInt("id"), set.getString("name"),
 						set.getString("foto"), set.getDouble("preis"),
 						set.getString("therapieart"), set.getString("rasse"),
@@ -271,10 +273,6 @@ public class JDBCPferdDAO implements PferdDAO {
 		} catch (SQLException e) {
 			log.debug("Fehler während der Erstellung der Pferdeliste aufgetreten!");
 			throw new JDBCPferdPersistenceException();
-		}
-		log.debug("Liste der Pferde:");
-		for(Pferd p : pferde) {
-			log.info("Pferd Nr. " + p.toString());
 		}
 		return pferde;
 	}

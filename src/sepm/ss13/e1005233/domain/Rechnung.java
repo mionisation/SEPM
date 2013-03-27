@@ -87,4 +87,16 @@ public class Rechnung {
 	public String toString() {
 		return date.toString();
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		Rechnung r;
+		if(obj instanceof Rechnung)
+			r = (Rechnung) obj;
+		else
+			return false;
+		return (this.buchungen.equals(r.getBuchungen()))&&(this.date.equals(r.getDate())&&
+				this.gesamtpreis == r.getGesamtpreis())&& (this.gesamtstunden == r.getGesamtstunden()&&
+				this.name.equals(r.getName()))&& this.telefon == r.getTelefon() && this.zahlungsart.equals(r.getZahlungsart());
+	}
 }
