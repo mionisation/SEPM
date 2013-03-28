@@ -1,13 +1,14 @@
 package sepm.ss13.e1005233.service;
 
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import sepm.ss13.e1005233.dao.JDBCPferdDAO;
+import sepm.ss13.e1005233.dao.JDBCRechnungDAO;
 import sepm.ss13.e1005233.dao.PferdDAO;
 import sepm.ss13.e1005233.dao.RechnungDAO;
 import sepm.ss13.e1005233.domain.*;
@@ -22,8 +23,9 @@ public class JDBCService implements Service {
 	public JDBCService() {
 		try {
 			this.pferdDao = new JDBCPferdDAO();
+			this.rechnungDao = new JDBCRechnungDAO();
 		} catch (SQLException e) {
-			log.error("could not create PferdDAO");
+			log.error("could not create PferdDAO or RechnungDAO");
 			e.printStackTrace();
 		}
 		log.debug("JDBCService erfolgreich erstellt!");
@@ -180,11 +182,13 @@ public class JDBCService implements Service {
 	
 
 	@Override
-	public List<Pferd> getPopularPferde() {
+	public List<Pferd> getPopularPferde() throws NotEnoughPferdeException {
 		log.info("Beginne Suche nach den 3 meistgebuchten Pferden...");
 		//alle Pferde die durchgegangen werden müssen
 		List<Pferd> all = findAllPferde();
 		int countPferde = all.size();
+		if(countPferde < 3)
+			throw new NotEnoughPferdeException();
 		//ein Hilfsarray um die Pferde nach gebuchten Stunden sortieren zu können
 		PferdVergleich[] sumPferde = new PferdVergleich[countPferde];
 		int stundenCounter;
@@ -264,6 +268,14 @@ public class JDBCService implements Service {
 			e.printStackTrace();
 		}
 		return id;
+	}
+	
+	public Connection getConnection() {
+		Connection con = ((JDBCPferdDAO) pferdDao).getConnection();
+		if(con.equals(((JDBCRechnungDAO)rechnungDao).getConnection()))		
+			return ((JDBCPferdDAO) pferdDao).getConnection();
+		else
+			return null;
 	}
 	
 	/**

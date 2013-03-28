@@ -6,6 +6,7 @@ import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.BuchungValidationException;
+import sepm.ss13.e1005233.exceptions.NotEnoughPferdeException;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
@@ -77,8 +78,9 @@ public interface Service {
 	/**
 	 * Diese Methode gibt die drei beliebtesten Pferde zurück
 	 * @return eine Liste der drei beliebtesten Pferde
+	 * @throws NotEnoughPferdeException wenn weniger als 3 Pferde vorhanden sind
 	 */
-	public List<Pferd> getPopularPferde();
+	public List<Pferd> getPopularPferde() throws NotEnoughPferdeException;
 	
 	/**
 	 * Diese Methode verteuert alle Pferde aus einer Liste um 5%

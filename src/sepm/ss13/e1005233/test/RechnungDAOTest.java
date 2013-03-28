@@ -3,7 +3,6 @@ package sepm.ss13.e1005233.test;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import sepm.ss13.e1005233.dao.RechnungDAO;
 import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
-import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
 
 /**
@@ -121,4 +119,6 @@ public abstract class RechnungDAOTest {
 		//nach der Rechnung wird gesucht
 		rechnungDao.getRechnung(testRechnung);
 	}
+	
+	//TODO findall, getBuchungen
 }

@@ -42,4 +42,12 @@ public interface RechnungDAO {
 	 * @throws JDBCRechnungPersistenceException wenn etwas während der Rückgabe fehlgeschlagen ist
 	 */
 	public List<Buchung> getBuchungen(Pferd p) throws RechnungPersistenceException;
+	
+	/**
+	 * Gibt eine Liste der Buchungen, die einer Rechnung zugeordnet sind, zurück
+	 * @param r die Rechnung, deren Buchungen zurückgegeben werden sollen
+	 * @return die Liste der zugeordneten Buchungen
+	 * @throws JDBCRechnungPersistenceException wenn etwas während der Rückgabe fehlgeschlagen ist
+	 */
+	public List<Buchung> getBuchungen(Rechnung r) throws JDBCRechnungPersistenceException;
 }

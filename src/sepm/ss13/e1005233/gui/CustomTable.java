@@ -1,6 +1,5 @@
 package sepm.ss13.e1005233.gui;
 
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 public class CustomTable extends DefaultTableModel{
@@ -17,7 +16,8 @@ public class CustomTable extends DefaultTableModel{
 		return false;
 	}
 	
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     public Class getColumnClass(int column) {
         switch (column) {
             case 0:

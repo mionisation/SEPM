@@ -1,7 +1,5 @@
 package sepm.ss13.e1005233.dao;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,6 @@ import org.apache.log4j.Logger;
 import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
-import sepm.ss13.e1005233.exceptions.JDBCPferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.JDBCRechnungPersistenceException;
 
 /**
@@ -95,12 +92,7 @@ public class JDBCRechnungDAO implements RechnungDAO {
 		}
 	}
 	
-	/**
-	 * Gibt eine Liste der Buchungen, die einer Rechnung zugeordnet sind, zurück
-	 * @param r die Rechnung, deren Buchungen zurückgegeben werden sollen
-	 * @return die Liste der zugeordneten Buchungen
-	 * @throws JDBCRechnungPersistenceException wenn etwas während der Rückgabe fehlgeschlagen ist
-	 */
+	@Override
 	public List<Buchung> getBuchungen(Rechnung r) throws JDBCRechnungPersistenceException {
 		ResultSet buchungQ = null;
 		try {
