@@ -302,4 +302,20 @@ public class JDBCService implements Service {
 				return 0;
 		}
 	}
+
+	@Override
+	public List<Buchung> getBuchungen(Rechnung r) {
+		List<Buchung> buchungen = null;
+		if(r.getDate() == null) {
+			log.debug("Kein Datum in Rechnung!");
+			throw new RechnungValidationException();
+		}
+		try {
+			buchungen = rechnungDao.getBuchungen(r);
+		} catch (JDBCRechnungPersistenceException e) {
+			log.debug("Fehler während Rückgabe der Buchungen!");
+			e.printStackTrace();
+		}
+		return buchungen;
+	}
 }

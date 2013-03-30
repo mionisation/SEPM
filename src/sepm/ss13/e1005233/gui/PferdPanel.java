@@ -74,7 +74,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] insertTherapieArten = {"Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
-	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Kinderfreundlich"};
+	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Für Kinder"};
 	private final String[] aktivColumnNames = {"ID#", "Name", "Preis", "Stunden"};
 	private ListSelectionModel ldm;
 	private int editPferdId;

@@ -2,6 +2,7 @@ package sepm.ss13.e1005233.service;
 
 import java.util.List;
 
+import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
@@ -95,6 +96,13 @@ public interface Service {
 	 * @return die gesuchte Rechnung
 	 */
 	public Rechnung getRechnung(Rechnung r);
+	
+	/**
+	 * Diese Methode gibt alle Buchungen zu einer Rechnung zurück
+	 * @param r die Rechnung dessen Buchungen gesucht sind
+	 * @return eine Lsite aller der Rechnung zugeordneten Buchungen
+	 */
+	public List<Buchung> getBuchungen(Rechnung r);
 	
 	/**
 	 * Diese Methode gibt alle Rechnungen zurück

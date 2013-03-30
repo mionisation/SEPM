@@ -4,8 +4,6 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicTabbedPaneUI.TabSelectionHandler;
-
 import sepm.ss13.e1005233.service.JDBCService;
 
 public class MainFrame extends JFrame implements ChangeListener{
