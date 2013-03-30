@@ -2,12 +2,12 @@ package sepm.ss13.e1005233.gui;
 
 import javax.swing.table.DefaultTableModel;
 
-public class CustomTable extends DefaultTableModel{
-	public CustomTable(Object[][] data, String[] columnNames) {
+public class PferdeTable extends DefaultTableModel{
+	public PferdeTable(Object[][] data, String[] columnNames) {
 		super(data, columnNames);
 	}
 
-	public CustomTable() {
+	public PferdeTable() {
 		super();
 	}
 

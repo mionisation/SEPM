@@ -14,5 +14,7 @@ public class ServiceTest {
 	public void setService(Service serv) {
 		this.service = serv;
 	}
+	
+	//TODO service tests
 
 }

@@ -55,7 +55,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private String selectedPic;
 	private JCheckBox insertKinder, editInsertKinder;
 	private JFrame parent;
-	private CustomTable ctm;
+	private PferdeTable ctm;
 	private JFileChooser picChooser;
 	private ListSelectionListener lsl= new ListSelectionListener() {
 	      @Override
@@ -79,11 +79,11 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private ListSelectionModel ldm;
 	private int editPferdId;
 	private static final Logger log = Logger.getLogger(PferdPanel.class);
-	public PferdPanel(JFrame parent) {
+	public PferdPanel(JFrame parent, JDBCService service) {
 		super(new MigLayout());
 		log.debug("Erstelle neues PferdPanel...");
 		
-		service = new JDBCService();
+		this.service = service;
 		picChooser = new JFileChooser();
 		selectedPic = "";
 		picChooser.setFileFilter(new BildFilter());
@@ -102,8 +102,10 @@ public class PferdPanel extends JPanel implements ActionListener{
 		menuItem.setActionCommand("NeueRechnung");
 		menu.add(menuItem);
 		
-		menuItem = new JMenuItem("Hilfe");
-		menu.add(menuItem);
+		//TODO vielleicht hilfe schreiben
+		/*menuItem = new JMenuItem("Hilfe");
+		menu.add(menuItem);*/
+		
 		menuItem = new JMenuItem("Beenden");
 		menuItem.addActionListener(this);
 		menuItem.setActionCommand("Beenden");
@@ -180,7 +182,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		add(deleteButton, "wrap, gaptop 5");
 				
 		//Erstelle Pferdetabelle, uneditierbar
-		ctm = new CustomTable(updateTable(service.findAllUndeletedPferde()), pferdColumnNames);
+		ctm = new PferdeTable(updateTable(service.findAllUndeletedPferde()), pferdColumnNames);
 		pferde = new JTable(ctm);
 		ldm = pferde.getSelectionModel();
 		ldm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -206,7 +208,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		neuRechnungPanel.add(rechnungAbbrechenButton, "wrap");
 		
 		Object[][] temp = {};
-		aktiv = new JTable(new CustomTable(temp, aktivColumnNames));
+		aktiv = new JTable(new PferdeTable(temp, aktivColumnNames));
 		scrollpaneaktiv = new JScrollPane(aktiv);
 		neuRechnungPanel.add(scrollpaneaktiv);
 		add(neuRechnungPanel, "dock east");
@@ -451,7 +453,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		}
 
 		try {
-			ctm = new CustomTable(updateTable(service.findBy(new SuchPferd(nameTextField.getText(), therapieart,
+			ctm = new PferdeTable(updateTable(service.findBy(new SuchPferd(nameTextField.getText(), therapieart,
 					rasseTextField.getText(), Double.parseDouble(preisVonTextField.getText()),
 					Double.parseDouble(preisBisTextField.getText()), kinderfreundlich))), pferdColumnNames);
 		    pferde.setModel(ctm);
@@ -690,6 +692,26 @@ public class PferdPanel extends JPanel implements ActionListener{
 		default:
 			break;
 		}
+		
+	}
+
+	public void addMenus() {		
+		menuItem = new JMenuItem("Neues Pferd...");
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand("NeuesPferdForm");
+		menu.add(menuItem, 0);
+		
+		menuItem = new JMenuItem("Neue Rechnung...");
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand("NeueRechnung");
+		menu.add(menuItem, 1);
+		
+	}
+
+	public void deleteMenus() {
+		menu.remove(menu.getMenuComponent(0));
+		menu.remove(menu.getMenuComponent(0));
+		
 		
 	}
 

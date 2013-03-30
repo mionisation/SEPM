@@ -232,6 +232,7 @@ public class JDBCService implements Service {
 		}
 
 	}
+	//TODO more dummy tests
 
 	@Override
 	public Rechnung getRechnung(Rechnung r) {

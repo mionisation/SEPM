@@ -2,22 +2,49 @@ package sepm.ss13.e1005233.gui;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicTabbedPaneUI.TabSelectionHandler;
 
-public class MainFrame extends JFrame{
+import sepm.ss13.e1005233.service.JDBCService;
 
+public class MainFrame extends JFrame implements ChangeListener{
+
+	private JDBCService service;
+	private  JTabbedPane tabs;
+	private PferdPanel pferde;
+	private RechnungPanel rechnungen;
 	public void create() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Pferdetherapie Manager 2013");
         
-        JTabbedPane tabs = new JTabbedPane();
-        PferdPanel pferde = new PferdPanel(this);
-        RechnungPanel rechnungen = new RechnungPanel();
+        tabs = new JTabbedPane();
+        service = new JDBCService();
+        pferde = new PferdPanel(this, service);
+        rechnungen = new RechnungPanel(this, service);
         tabs.addTab("Pferdeliste", pferde);
         setJMenuBar(pferde.getJMenuBar());
         tabs.addTab("Rechnungen", rechnungen);
+        tabs.addChangeListener(this);
         add(tabs);
         //Display the window.
         pack();
         setVisible(true);
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent ce) {
+		switch (tabs.getTitleAt(tabs.getSelectedIndex())) {
+		case "Pferdeliste":
+			pferde.addMenus();
+			break;
+		case "Rechnungen":
+			pferde.deleteMenus();
+			break;
+		default:
+			break;
+		}
+		
 	}
 }
