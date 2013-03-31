@@ -1,7 +1,5 @@
 package sepm.ss13.e1005233.gui;
 
-import java.sql.Timestamp;
-
 import javax.swing.table.DefaultTableModel;
 
 public class BuchungTable extends DefaultTableModel{

@@ -38,6 +38,7 @@ public class MainFrame extends JFrame implements ChangeListener{
 			pferde.addMenus();
 			break;
 		case "Rechnungen":
+			rechnungen.findAllAndUpdateRechnungenTable();
 			pferde.deleteMenus();
 			pferde.removeEditPferd();
 			pferde.removeRechnung();

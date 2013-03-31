@@ -83,6 +83,12 @@ public class RechnungPanel extends JPanel {
 		add(detailPanel);
 		
 	}
+	//TODO quartalauswertung
+	public void findAllAndUpdateRechnungenTable() {
+		ctm = new RechnungTable((updateRechnungenTable(service.findAllRechnungen())), rechnungColumnNames);
+		rechnungen.setModel(ctm);
+		ctm.fireTableDataChanged();
+	}
 	
 	public Object[][] updateRechnungenTable(List<Rechnung> rechnungList){
 		log.debug("Aktualisiere Tabelle mit Rechnungen...");
@@ -94,7 +100,6 @@ public class RechnungPanel extends JPanel {
 			allRechnungenArray[i][2] = r.getGesamtpreis();
 			allRechnungenArray[i][3] = r.getGesamtstunden();
 			allRechnungenArray[i][4] = r.getZahlungsart();
-			//TODO change?
 			if(r.getTelefon() != 0)
 				allRechnungenArray[i][5] = r.getTelefon();
 			

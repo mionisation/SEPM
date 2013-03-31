@@ -11,8 +11,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -116,10 +114,6 @@ public class PferdPanel extends JPanel implements ActionListener{
 		menuItem.addActionListener(this);
 		menuItem.setActionCommand("NeueRechnung");
 		menu.add(menuItem);
-		
-		//TODO vielleicht hilfe schreiben
-		/*menuItem = new JMenuItem("Hilfe");
-		menu.add(menuItem);*/
 		
 		menuItem = new JMenuItem("Beenden");
 		menuItem.addActionListener(this);
@@ -615,7 +609,6 @@ public class PferdPanel extends JPanel implements ActionListener{
 				log.debug("Fehler beim abspeichern!");
 				JOptionPane.showMessageDialog(this,"Überprüfe ob alle Constraints eingehalten wurden!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 			}
-			// TODO rechnung abspeichern
 			clearAktivTable();
 			removeRechnung();
 			updateFrame();
@@ -638,7 +631,6 @@ public class PferdPanel extends JPanel implements ActionListener{
 			String eingabe = "";
 			while(stunden<=0) {
 				try {
-				//	stunden = Integer.parseInt(JOptionPane.showInputDialog(this, "Wieviele Stunden sollen gebucht werden (>0):", "Stundeneingabe", JOptionPane.YES_NO_CANCEL_OPTION));
 				eingabe = JOptionPane.showInputDialog(this, "Wieviele Stunden sollen gebucht werden (>0):", "Stundeneingabe", JOptionPane.YES_NO_CANCEL_OPTION);
 				if(eingabe == null || eingabe.isEmpty())
 					return;
@@ -651,9 +643,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			log.debug("Für das Pferd " + id + " wurden " + stunden + " Stunden gewählt");			
 			atm = new AktivTable(aktivRowNames(id, service.getPferd(new Pferd(id)).getName() , service.getPferd(new Pferd(id)).getPreis(), stunden), aktivColumnNames);
 			aktiv.setModel(atm);
-			atm.fireTableDataChanged();
-			//TODO rechnungseingaben, rechnung abspeichern
-			
+			atm.fireTableDataChanged();			
 			break;
 		case "RechnungAbbrechen":
 			log.info("Breche Anlegen neuer Rechnung ab...");
