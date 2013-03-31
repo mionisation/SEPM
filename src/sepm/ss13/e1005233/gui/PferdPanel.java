@@ -1,11 +1,15 @@
 package sepm.ss13.e1005233.gui;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -29,10 +33,16 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
+
+import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.domain.Pferd;
+import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
+import sepm.ss13.e1005233.exceptions.BuchungValidationException;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
+import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
+import sepm.ss13.e1005233.exceptions.RechnungValidationException;
 import sepm.ss13.e1005233.service.JDBCService;
 import sepm.ss13.e1005233.service.Service;
 
@@ -46,13 +56,13 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private JButton deleteButton, updatePferdButton, suchButton,
 	addZuRechnungButton, rechnungSpeichernButton, resetButton, cancelPferdButton,
 	addPferdButton, rechnungAbbrechenButton, picButton, editPicButton, editPferdButton;
-	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel, editPferdPanel;
+	private JPanel neuRechnungPanel, suchPanel,	neuPferdPanel, editPferdPanel, neuRechnungDetailsPanel;
 	private JLabel picPferd, pferdLabel, editPicLabel, descSearch, descInsert, picLabel, editInsert;
-	private JComboBox<String> therapieAuswahl, kinderAuswahl, therapieForm, editTherapieForm;
+	private JComboBox<String> therapieAuswahl, kinderAuswahl, therapieForm, editTherapieForm, zahlungsAuswahl;
 	private JMenuBar menuBar;
 	private JMenu menu;
 	private Pferd p;
-	private String selectedPic;
+	private String selectedPic, zahlungsart;
 	private JCheckBox insertKinder, editInsertKinder;
 	private JFrame parent;
 	private PferdeTable ctm;
@@ -68,7 +78,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	      }
 	    };
 	private JTextField preisVonTextField, preisBisTextField, nameTextField, rasseTextField, nameForm,
-	 editNameForm, editPreisForm, editRasseForm, rasseForm, preisForm;
+	 editNameForm, editPreisForm, editRasseForm, rasseForm, preisForm, rNameForm, telefonForm;
 	private JMenuItem menuItem;
 	private String therapieart;
 	private final Object[][] temp = {};
@@ -76,8 +86,9 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] insertTherapieArten = {"Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
+	private final String[] zahlungsarten = {"Barzahlung", "Kreditkarte", "Überweisung"};
 	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Für Kinder"};
-	private final String[] aktivColumnNames = {"ID#", "Name", "Stundenpreis", "Stunden"};
+	private final String[] aktivColumnNames = {"ID#", "Name", "Preis/h", "Stunden"};
 	private ListSelectionModel ldm;
 	private int editPferdId;
 	private int aktivRows;
@@ -213,13 +224,40 @@ public class PferdPanel extends JPanel implements ActionListener{
 		rechnungAbbrechenButton.setActionCommand("RechnungAbbrechen");
 		neuRechnungPanel.add(rechnungAbbrechenButton, "wrap");
 		
+		neuRechnungDetailsPanel = new JPanel(new MigLayout());
+		
+		descInsert = new JLabel("Name:    ");
+		neuRechnungDetailsPanel.add(descInsert, "split 4");
+		rNameForm = new JTextField(8);
+		neuRechnungDetailsPanel.add(rNameForm);
+		
+		descInsert = new JLabel("Zahlungsart: ");
+		neuRechnungDetailsPanel.add(descInsert);
+		zahlungsAuswahl = new JComboBox<String>(zahlungsarten);
+		zahlungsAuswahl.setSelectedIndex(-1);
+		neuRechnungDetailsPanel.add(zahlungsAuswahl, "wrap");
+		
+		descInsert = new JLabel("Telefon: ");		
+		neuRechnungDetailsPanel.add(descInsert, "split 2");
+		telefonForm = new JTextField(8);
+		neuRechnungDetailsPanel.add(telefonForm, "wrap");
+		
+		neuRechnungPanel.add(neuRechnungDetailsPanel, "wrap");
+		
+		
 		aktivRows = 0;
 		atm = new AktivTable(temp, aktivColumnNames);
 		aktiv = new JTable(atm);
 		scrollpaneaktiv = new JScrollPane(aktiv);
+		scrollpaneaktiv.setPreferredSize(new Dimension(340, 370));
 		ldm = aktiv.getSelectionModel();
 		ldm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		neuRechnungPanel.add(scrollpaneaktiv);
+		
+
+		
+		
+		
 		add(neuRechnungPanel, "dock east");
 		removeRechnung();
 		
@@ -525,6 +563,58 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		case "RechnungSpeichern":
 			log.info("Speichere Rechnung ab...");
+			if(atm.getRowCount() == 0) {
+				log.debug("Es wurden keine Pferde zur Buchung gewählt, breche Abspeichern ab...");
+				JOptionPane.showMessageDialog(this,"Wähle zuerst zu buchende Pferde aus!", "Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			zahlungsart = "";
+			switch (zahlungsAuswahl.getSelectedIndex()) {
+			case -1:
+				JOptionPane.showMessageDialog(this,"Gebe eine Zahlungsart an.", "Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			case 0:
+				zahlungsart = "Barzahlung";
+				break;
+			case 1:
+				zahlungsart = "Kreditkarte";
+				break;
+			case 2:
+				zahlungsart = "Ueberweisung";
+				break;
+			}
+			zahlungsAuswahl.setSelectedIndex(-1);
+			Timestamp datum = new Timestamp(new Date().getTime());
+			double gesamtpreis = 0;
+			int gesamtstunden = 0;
+			try {
+			List<Buchung> buchungen = new ArrayList<Buchung>();
+			for(int i = 0; i < atm.getRowCount(); i++) {
+				int id = (int) atm.getValueAt(i, 0);
+				double preis = (double) atm.getValueAt(i, 2);
+				int stunden = (int) atm.getValueAt(i, 3);
+				gesamtpreis += (preis*stunden);
+				gesamtstunden += stunden;
+				buchungen.add(new Buchung(new Pferd(id), new Rechnung(datum), stunden, preis));
+			}
+			Rechnung r = new Rechnung(datum, rNameForm.getText(), zahlungsart, gesamtpreis, gesamtstunden, Long.parseLong(telefonForm.getText()), buchungen);
+			service.insertRechnung(r);
+			} catch (NumberFormatException e3) {
+				log.debug("Eingabe ist keine Dezimalzahl!");
+				JOptionPane.showMessageDialog(this,"Telefonnummer muss eine Ganzzahl (größer als 1000 und kleiner als 9223372036854775806) sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch (BuchungValidationException e4) {
+				log.debug("Buchungsinformationen fehlerhaft.");
+				JOptionPane.showMessageDialog(this,"Bitte überprüfe die Buchungen.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch (RechnungValidationException e1) {
+				log.debug("Rechnungsattribute fehlerhaft!");
+				JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				break;
+			} catch (RechnungPersistenceException e1) {
+				log.debug("Fehler beim abspeichern!");
+				JOptionPane.showMessageDialog(this,"Überprüfe ob alle Constraints eingehalten wurden!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+			}
 			// TODO rechnung abspeichern
 			clearAktivTable();
 			removeRechnung();
@@ -658,6 +748,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 				return;
 			}
 			removeRechnung();
+			clearAktivTable();
 			removePferdForm();
 			addEditPferd();
 			updateFrame();
@@ -777,7 +868,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		oldRows = newRows;
 		return newRows;
 	}
-
+	//fügt Pferd- und Rechnung-erstellen-menüs hinzu
 	public void addMenus() {		
 		menuItem = new JMenuItem("Neues Pferd...");
 		menuItem.addActionListener(this);
@@ -791,6 +882,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		
 	}
 
+	//löscht Pferd- und Rechnung-erstellen-menüs
 	public void deleteMenus() {
 		menu.remove(menu.getMenuComponent(0));
 		menu.remove(menu.getMenuComponent(0));
