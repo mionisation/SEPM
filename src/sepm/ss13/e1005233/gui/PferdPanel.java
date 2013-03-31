@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -28,7 +29,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
-
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
@@ -77,9 +77,11 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] insertTherapieArten = {"Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
 	private final String[] pferdColumnNames = {"ID#", "Name", "Preis", "Therapieart", "Rasse", "Für Kinder"};
-	private final String[] aktivColumnNames = {"ID#", "Name", "Preis", "Stunden"};
+	private final String[] aktivColumnNames = {"ID#", "Name", "Stundenpreis", "Stunden"};
 	private ListSelectionModel ldm;
 	private int editPferdId;
+	private int aktivRows;
+	private Object[][] oldRows = {};
 	private static final Logger log = Logger.getLogger(PferdPanel.class);
 	public PferdPanel(JFrame parent, JDBCService service) {
 		super(new MigLayout());
@@ -211,6 +213,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 		rechnungAbbrechenButton.setActionCommand("RechnungAbbrechen");
 		neuRechnungPanel.add(rechnungAbbrechenButton, "wrap");
 		
+		aktivRows = 0;
 		atm = new AktivTable(temp, aktivColumnNames);
 		aktiv = new JTable(atm);
 		scrollpaneaktiv = new JScrollPane(aktiv);
@@ -522,23 +525,49 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		case "RechnungSpeichern":
 			log.info("Speichere Rechnung ab...");
+			// TODO rechnung abspeichern
+			clearAktivTable();
 			removeRechnung();
 			updateFrame();
 			break;
 		case "RechnungHinzufügen":
+			if(pferde.getSelectedRow() < 0) {
+				JOptionPane.showMessageDialog(this,"Wähle zuerst ein Pferd aus!","Auswahlfehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			int id = (int) pferde.getValueAt(pferde.getSelectedRow(), 0);
+			for (int i = 0; i < atm.getRowCount(); i++) {
+				if( id == (int)atm.getValueAt(i, 0)) {
+					JOptionPane.showMessageDialog(this,"Pferd schon in der Tabelle!","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
 			log.info("Füge Pferd zur Rechnung hinzu mit der ID " + id);
-			//TODO stundenabfrage
-			
-			atm = new AktivTable(temp, aktivColumnNames);
+			//Stundenabfrage
+			int stunden = 0;
+			String eingabe = "";
+			while(stunden<=0) {
+				try {
+				//	stunden = Integer.parseInt(JOptionPane.showInputDialog(this, "Wieviele Stunden sollen gebucht werden (>0):", "Stundeneingabe", JOptionPane.YES_NO_CANCEL_OPTION));
+				eingabe = JOptionPane.showInputDialog(this, "Wieviele Stunden sollen gebucht werden (>0):", "Stundeneingabe", JOptionPane.YES_NO_CANCEL_OPTION);
+				if(eingabe == null || eingabe.isEmpty())
+					return;
+				stunden = Integer.parseInt(eingabe);
+				}
+				catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(this,"Stundenangabe muss eine realistisch große Ganzzahl sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			log.debug("Für das Pferd " + id + " wurden " + stunden + " Stunden gewählt");			
+			atm = new AktivTable(aktivRowNames(id, service.getPferd(new Pferd(id)).getName() , service.getPferd(new Pferd(id)).getPreis(), stunden), aktivColumnNames);
 			aktiv.setModel(atm);
 			atm.fireTableDataChanged();
-			//TODO erase, do shit
-			//aktiv.setValueAt(id, 0, 0);
+			//TODO rechnungseingaben, rechnung abspeichern
 			
 			break;
 		case "RechnungAbbrechen":
 			log.info("Breche Anlegen neuer Rechnung ab...");
+			clearAktivTable();
 			removeRechnung();
 			updateFrame();
 			break;
@@ -548,6 +577,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		case "NeuesPferdForm":
 			log.info("Bereite Form für neues Pferd vor...");
+			clearAktivTable();
 			removeRechnung();
 			removeEditPferd();
 			addPferdForm();
@@ -711,6 +741,41 @@ public class PferdPanel extends JPanel implements ActionListener{
 			break;
 		}
 		
+	}
+	
+	/**
+	 * Löscht alle Daten aus der zu erstellenden Rechnung
+	 */
+	private void clearAktivTable() {
+		aktivRows = 0;
+		atm = new AktivTable(temp, aktivColumnNames);
+		aktiv.setModel(atm);
+		atm.fireTableDataChanged();		
+	}
+
+	/**
+	 * Erstellt die Daten für die anzulegende Rechnung
+	 * @param id ID des gebuchten Pferds
+	 * @param name Name des Pferds
+	 * @param preis Preis des Pferds
+	 * @param stunden die Stunden, die das Pferd gebucht werden soll
+	 * @return ein Array aller Daten der neu erstellten Rechnung
+	 */
+	private Object[][] aktivRowNames(int id, String name, double preis, int stunden) {
+		Object[][] newRows = new Object[++aktivRows][4];
+		for(int i = 0; i < aktivRows-1; i++ ) {
+			newRows[i][0] = oldRows[i][0];
+			newRows[i][1] = oldRows[i][1];
+			newRows[i][2] = oldRows[i][2];
+			newRows[i][3] = oldRows[i][3];
+			
+		}
+		newRows[aktivRows-1][0] = id;
+		newRows[aktivRows-1][1] = name;
+		newRows[aktivRows-1][2] = preis;
+		newRows[aktivRows-1][3] = stunden;
+		oldRows = newRows;
+		return newRows;
 	}
 
 	public void addMenus() {		
