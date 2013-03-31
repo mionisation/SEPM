@@ -56,6 +56,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private JCheckBox insertKinder, editInsertKinder;
 	private JFrame parent;
 	private PferdeTable ctm;
+	private AktivTable atm;
 	private JFileChooser picChooser;
 	private ListSelectionListener lsl= new ListSelectionListener() {
 	      @Override
@@ -70,6 +71,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	 editNameForm, editPreisForm, editRasseForm, rasseForm, preisForm;
 	private JMenuItem menuItem;
 	private String therapieart;
+	private final Object[][] temp = {};
 	private final String[] loeschen = {"Ja", "Nein"};
 	private final String[] kinderfreundlich = {"(Egal)", "Ja", "Nein"};
 	private final String[] therapieArten = {"(Egal)", "Hippotherapie","Heilpädagogisches Voltigieren","Heilpädagogisches Reiten"};
@@ -195,6 +197,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 		neuRechnungPanel = new JPanel(new MigLayout());
 		
 		addZuRechnungButton = new JButton("Hinzufügen");
+		addZuRechnungButton.addActionListener(this);
+		addZuRechnungButton.setActionCommand("RechnungHinzufügen");
 		neuRechnungPanel.add(addZuRechnungButton, "split 3");
 		
 		rechnungSpeichernButton = new JButton("Rechnung speichern");
@@ -207,9 +211,11 @@ public class PferdPanel extends JPanel implements ActionListener{
 		rechnungAbbrechenButton.setActionCommand("RechnungAbbrechen");
 		neuRechnungPanel.add(rechnungAbbrechenButton, "wrap");
 		
-		Object[][] temp = {};
-		aktiv = new JTable(new PferdeTable(temp, aktivColumnNames));
+		atm = new AktivTable(temp, aktivColumnNames);
+		aktiv = new JTable(atm);
 		scrollpaneaktiv = new JScrollPane(aktiv);
+		ldm = aktiv.getSelectionModel();
+		ldm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		neuRechnungPanel.add(scrollpaneaktiv);
 		add(neuRechnungPanel, "dock east");
 		removeRechnung();
@@ -518,6 +524,18 @@ public class PferdPanel extends JPanel implements ActionListener{
 			log.info("Speichere Rechnung ab...");
 			removeRechnung();
 			updateFrame();
+			break;
+		case "RechnungHinzufügen":
+			int id = (int) pferde.getValueAt(pferde.getSelectedRow(), 0);
+			log.info("Füge Pferd zur Rechnung hinzu mit der ID " + id);
+			//TODO stundenabfrage
+			
+			atm = new AktivTable(temp, aktivColumnNames);
+			aktiv.setModel(atm);
+			atm.fireTableDataChanged();
+			//TODO erase, do shit
+			//aktiv.setValueAt(id, 0, 0);
+			
 			break;
 		case "RechnungAbbrechen":
 			log.info("Breche Anlegen neuer Rechnung ab...");

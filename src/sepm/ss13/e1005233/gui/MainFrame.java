@@ -39,6 +39,10 @@ public class MainFrame extends JFrame implements ChangeListener{
 			break;
 		case "Rechnungen":
 			pferde.deleteMenus();
+			pferde.removeEditPferd();
+			pferde.removeRechnung();
+			pferde.removePferdForm();
+			pack();
 			break;
 		default:
 			break;
