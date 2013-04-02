@@ -1,5 +1,7 @@
 package sepm.ss13.e1005233.gui;
 
+import java.awt.Toolkit;
+
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -29,6 +31,11 @@ public class MainFrame extends JFrame implements ChangeListener{
         //Display the window.
         pack();
         setVisible(true);
+        
+        
+        //TODO resize
+        getSize();
+        Toolkit.getDefaultToolkit().getScreenSize();
 	}
 
 	@Override
