@@ -19,7 +19,7 @@ public class JDBCService implements Service {
 	private PferdDAO pferdDao;
 	private RechnungDAO rechnungDao;
 	private static final Logger log = Logger.getLogger(JDBCService.class);
-	
+	//TODO catch connection exception
 	public JDBCService() {
 		try {
 			this.pferdDao = new JDBCPferdDAO();
