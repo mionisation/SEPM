@@ -1,5 +1,6 @@
 package sepm.ss13.e1005233.gui;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -14,6 +15,7 @@ public class MainFrame extends JFrame implements ChangeListener{
 	private  JTabbedPane tabs;
 	private PferdPanel pferde;
 	private RechnungPanel rechnungen;
+	private Dimension screensize;	
 	public void create() {
         
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,10 +34,11 @@ public class MainFrame extends JFrame implements ChangeListener{
         pack();
         setVisible(true);
         
-        
-        //TODO resize
+        //position in center
         getSize();
-        Toolkit.getDefaultToolkit().getScreenSize();
+        screensize = Toolkit.getDefaultToolkit().getScreenSize();        
+        
+        this.setLocation((int)(screensize.getWidth() - this.getWidth())/2, (int)(screensize.getHeight() - this.getHeight())/2);
 	}
 
 	@Override

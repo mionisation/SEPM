@@ -83,7 +83,7 @@ public class RechnungPanel extends JPanel {
 		add(detailPanel);
 		
 	}
-	//TODO quartalauswertung
+
 	public void findAllAndUpdateRechnungenTable() {
 		ctm = new RechnungTable((updateRechnungenTable(service.findAllRechnungen())), rechnungColumnNames);
 		rechnungen.setModel(ctm);

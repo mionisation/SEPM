@@ -19,13 +19,14 @@ public class JDBCService implements Service {
 	private PferdDAO pferdDao;
 	private RechnungDAO rechnungDao;
 	private static final Logger log = Logger.getLogger(JDBCService.class);
-	//TODO catch connection exception
 	public JDBCService() {
 		try {
 			this.pferdDao = new JDBCPferdDAO();
 			this.rechnungDao = new JDBCRechnungDAO();
 		} catch (SQLException e) {
 			log.error("could not create PferdDAO or RechnungDAO");
+			log.error("Check if Database is online... Exiting...");
+			System.exit(-1);
 			e.printStackTrace();
 		}
 		log.debug("JDBCService erfolgreich erstellt!");

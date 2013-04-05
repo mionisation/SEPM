@@ -37,6 +37,7 @@ import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.domain.SuchPferd;
 import sepm.ss13.e1005233.exceptions.BuchungValidationException;
+import sepm.ss13.e1005233.exceptions.NotEnoughPferdeException;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
 import sepm.ss13.e1005233.exceptions.PferdValidationException;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
@@ -113,6 +114,11 @@ public class PferdPanel extends JPanel implements ActionListener{
 		menuItem = new JMenuItem("Neue Rechnung...");
 		menuItem.addActionListener(this);
 		menuItem.setActionCommand("NeueRechnung");
+		menu.add(menuItem);
+		
+		menuItem = new JMenuItem("Beliebteste Pferde...");
+		menuItem.addActionListener(this);
+		menuItem.setActionCommand("PopularPferde");
 		menu.add(menuItem);
 		
 		menuItem = new JMenuItem("Beenden");
@@ -730,6 +736,31 @@ public class PferdPanel extends JPanel implements ActionListener{
 			service.deletePferd(getSelectedPferd());
 			startSuche();
 			updateFrame();
+			break;
+		case "PopularPferde" :
+			List<Pferd> popular = null;
+			try {
+				popular = service.getPopularPferde();
+			} catch (NotEnoughPferdeException e1) {
+				log.error("Es sind weniger als 3 Pferde gespeichert!");
+				JOptionPane.showMessageDialog(this,"Es sind weniger als 3 Pferde gespeichert!", "Fehler", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			String popularPferdeMessage = "Die Beliebtesten Pferde sind: \n";
+			int popularCount = 1;
+			for(Pferd p : popular) {
+				popularPferdeMessage += popularCount + ". " + p.getName() + " (ID: " + p.getId() + " ) \n";
+				popularCount++;
+			}
+			popularPferdeMessage += "Stundenpreis dieser Pferde um 5% erhöhen?";
+			
+			dec = JOptionPane.showOptionDialog(parent, popularPferdeMessage, "3 Meistgebuchten Pferde",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, loeschen, loeschen[0]);
+			if(dec == 0) {
+				service.verteurePferde(popular);
+				startSuche();
+			}
+			log.debug("Pferde erfolgreich um 5% verteuert!");
 			break;
 		case "PferdBearbeiten":
 			log.info("Bearbeite ausgewähltes Pferd...");
