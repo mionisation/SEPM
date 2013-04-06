@@ -66,6 +66,7 @@ public class PferdPanel extends JPanel implements ActionListener{
 	private JFrame parent;
 	private PferdeTable ctm;
 	private AktivTable atm;
+	private long telefonnummer;
 	private JFileChooser picChooser;
 	private ListSelectionListener lsl= new ListSelectionListener() {
 	      @Override
@@ -597,7 +598,8 @@ public class PferdPanel extends JPanel implements ActionListener{
 				gesamtstunden += stunden;
 				buchungen.add(new Buchung(new Pferd(id), new Rechnung(datum), stunden, preis));
 			}
-			Rechnung r = new Rechnung(datum, rNameForm.getText(), zahlungsart, gesamtpreis, gesamtstunden, Long.parseLong(telefonForm.getText()), buchungen);
+			telefonnummer = Long.parseLong(telefonForm.getText());
+			Rechnung r = new Rechnung(datum, rNameForm.getText(), zahlungsart, gesamtpreis, gesamtstunden, telefonnummer, buchungen);
 			service.insertRechnung(r);
 			} catch (NumberFormatException e3) {
 				log.debug("Eingabe ist keine Dezimalzahl!");
@@ -609,7 +611,10 @@ public class PferdPanel extends JPanel implements ActionListener{
 				break;
 			} catch (RechnungValidationException e1) {
 				log.debug("Rechnungsattribute fehlerhaft!");
-				JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				if(telefonnummer < 1000L || telefonnummer > 9223372036854775806L)
+					JOptionPane.showMessageDialog(this,"Telefonnummer muss eine Ganzzahl (größer als 1000 und kleiner als 9223372036854775806) sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
+				else
+					JOptionPane.showMessageDialog(this,"Name darf nicht leer sein.","Eingabefehler", JOptionPane.ERROR_MESSAGE);
 				break;
 			} catch (RechnungPersistenceException e1) {
 				log.debug("Fehler beim abspeichern!");
