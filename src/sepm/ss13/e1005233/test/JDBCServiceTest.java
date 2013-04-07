@@ -7,20 +7,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.service.JDBCService;
 
 public class JDBCServiceTest extends ServiceTest {
 
 	private static final Logger log = Logger.getLogger(JDBCServiceTest.class);
-	private JDBCService jdbcService;
-	
 	public JDBCServiceTest() {
 		super();
-		jdbcService = (JDBCService) this.service;
 		
 	}
 	

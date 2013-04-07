@@ -14,7 +14,6 @@ import sepm.ss13.e1005233.dao.RechnungDAO;
 import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.domain.Pferd;
 import sepm.ss13.e1005233.domain.Rechnung;
-import sepm.ss13.e1005233.exceptions.JDBCRechnungPersistenceException;
 import sepm.ss13.e1005233.exceptions.RechnungPersistenceException;
 
 /**

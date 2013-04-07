@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -18,7 +17,6 @@ import sepm.ss13.e1005233.dao.JDBCRechnungDAO;
 import sepm.ss13.e1005233.dao.RechnungDAO;
 import sepm.ss13.e1005233.domain.Buchung;
 import sepm.ss13.e1005233.domain.Pferd;
-import sepm.ss13.e1005233.domain.Rechnung;
 import sepm.ss13.e1005233.exceptions.BuchungValidationException;
 import sepm.ss13.e1005233.exceptions.NotEnoughPferdeException;
 import sepm.ss13.e1005233.exceptions.PferdPersistenceException;
@@ -32,11 +30,9 @@ public class ServiceTest {
 	protected Service service;
 	private static final Logger log = Logger.getLogger(ServiceTest.class);
 	private List<Pferd> pferde;
-	private List<Buchung> buchungen;
-	
 	public ServiceTest() {
 		this.service = null;
-		this.buchungen = new ArrayList<Buchung>();
+		new ArrayList<Buchung>();
 	}
 	
 	public void setService(Service serv) {
