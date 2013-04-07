@@ -101,7 +101,6 @@ public class ServiceTest {
 			}			
 		}
 		pferde = service.getPopularPferde();
-		System.out.println(ids[0] + " " + ids[1] + " " + ids[2] + " " + "     " + pferde);
 		assertThat(pferde.get(0).getId(), is( ids[0]));
 	}
 	
