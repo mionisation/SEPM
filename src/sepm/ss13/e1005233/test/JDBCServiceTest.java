@@ -50,7 +50,7 @@ public class JDBCServiceTest extends ServiceTest {
 		log.debug(this.getClass().getSimpleName() +" erfolgreich zurückgesetzt!");
 
 	}
-	
+	//TODO tests
 	/**
 	 * Dieser Test überprüft, ob die Überprüfung von
 	 * validen Buchungen funktioniert. Es werden sowohl gültige
@@ -61,6 +61,26 @@ public class JDBCServiceTest extends ServiceTest {
 		log.debug("Führe isBuchungValid-Test aus...");
 		log.info("Führe validen Buchungstest aus:");
 		//assertThat(jdbcService.isValid(new Buchung(pferd, rechnung, stunden, preis)), is(true));
+	}
+	
+	/**
+	 * Dieser Test überprüft, ob die Überprüfung von
+	 * validen Rechnungen funktioniert. Es werden sowohl gültige
+	 * als auch ungültige Rechnungen überprüft
+	 */
+	@Test
+	public void isRechnungValid() {
+		
+	}
+	
+	/**
+	 * Dieser Test überprüft, ob die Überprüfung von
+	 * validen PFerden funktioniert. Es werden sowohl gültige
+	 * als auch ungültige Pferde überprüft
+	 */
+	@Test
+	public void isPferdValid() {
+		
 	}
 	
 }

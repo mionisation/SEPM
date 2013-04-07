@@ -186,7 +186,7 @@ public class JDBCService implements Service {
 	public List<Pferd> getPopularPferde() throws NotEnoughPferdeException {
 		log.info("Beginne Suche nach den 3 meistgebuchten Pferden...");
 		//alle Pferde die durchgegangen werden müssen
-		List<Pferd> all = findAllPferde();
+		List<Pferd> all = findAllUndeletedPferde();
 		int countPferde = all.size();
 		if(countPferde < 3)
 			throw new NotEnoughPferdeException();
@@ -271,12 +271,8 @@ public class JDBCService implements Service {
 		return id;
 	}
 	
-	public Connection getConnection() {
-		Connection con = ((JDBCPferdDAO) pferdDao).getConnection();
-		if(con.equals(((JDBCRechnungDAO)rechnungDao).getConnection()))		
-			return ((JDBCPferdDAO) pferdDao).getConnection();
-		else
-			return null;
+	public Connection getConnection() throws SQLException {
+		return ((JDBCPferdDAO) pferdDao).getConnection();
 	}
 	
 	/**
