@@ -33,7 +33,7 @@ public class MainFrame extends JFrame implements ChangeListener{
         //Display the window.
         pack();
         setVisible(true);
-        
+        setResizable(false);
         //position in center
         getSize();
         screensize = Toolkit.getDefaultToolkit().getScreenSize();        
